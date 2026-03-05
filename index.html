@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>WorkTrack</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -16,27 +15,15 @@
   --green:#2A7A4A; --green-light:#C8EAD4;
   --amber:#C87820; --amber-light:#F5E8CC;
   --red:#C82A2A; --red-light:#F5CACA;
-  --blue:#2A5AC8; --blue-light:#CAD5F0;
   --border:#E8E4DE; --shadow:rgba(26,24,20,0.08); --radius:14px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;}
-body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);min-height:100vh;min-height:100dvh;}
+body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);min-height:100dvh;}
 
 /* PERMISSION OVERLAY */
-.perm-overlay {
-  position:fixed;inset:0;background:rgba(26,24,20,0.55);
-  z-index:500;display:flex;align-items:center;justify-content:center;
-  padding:20px;backdrop-filter:blur(4px);
-  transition:opacity 0.3s;
-}
+.perm-overlay{position:fixed;inset:0;background:rgba(26,24,20,0.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);transition:opacity 0.3s;}
 .perm-overlay.hidden{opacity:0;pointer-events:none;}
-.perm-card {
-  background:var(--white);border-radius:20px;
-  padding:36px 28px;max-width:360px;width:100%;
-  box-shadow:0 20px 60px rgba(26,24,20,0.2);
-  text-align:center;animation:popIn 0.3s cubic-bezier(.34,1.56,.64,1);
-}
+.perm-card{background:var(--white);border-radius:20px;padding:36px 28px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(26,24,20,0.2);text-align:center;animation:popIn 0.3s cubic-bezier(.34,1.56,.64,1);}
 @keyframes popIn{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)}}
 .perm-icon{font-size:3rem;margin-bottom:14px;}
 .perm-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--ink);margin-bottom:8px;}
@@ -44,7 +31,6 @@ body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);mi
 .perm-desc strong{color:var(--ink);}
 .perm-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--accent);color:white;font-family:'DM Mono',monospace;font-size:0.82rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:background 0.2s,transform 0.15s;}
 .perm-btn:hover{background:var(--accent-hover);transform:translateY(-1px);}
-.perm-btn:active{transform:scale(0.97);}
 .perm-skip{display:block;margin-top:12px;font-size:0.7rem;color:var(--ink-muted);cursor:pointer;text-decoration:underline;}
 .perm-denied{background:var(--amber-light);border:1.5px solid var(--amber);border-radius:10px;padding:12px 14px;margin-top:16px;font-size:0.72rem;color:var(--amber);line-height:1.5;display:none;}
 
@@ -54,15 +40,17 @@ body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);mi
 .logo span{color:var(--accent);}
 .status-pill{display:flex;align-items:center;gap:6px;background:var(--cream);border:1.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:0.66rem;letter-spacing:0.1em;color:var(--ink-muted);text-transform:uppercase;transition:all 0.3s;}
 .status-pill.running{background:var(--green-light);border-color:var(--green);color:var(--green);}
-.status-pill.paused {background:var(--amber-light);border-color:var(--amber);color:var(--amber);}
-.status-pill.outside{background:var(--red-light);  border-color:var(--red);  color:var(--red);}
+.status-pill.paused{background:var(--amber-light);border-color:var(--amber);color:var(--amber);}
+.status-pill.outside{background:var(--red-light);border-color:var(--red);color:var(--red);}
 .status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
-.status-pill.running .status-dot,
-.status-pill.outside .status-dot{animation:blink 1.5s infinite;}
+.status-pill.running .status-dot,.status-pill.outside .status-dot{animation:blink 1.5s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-/* LAYOUT */
 .container{max-width:680px;margin:0 auto;padding:24px 20px 48px;display:flex;flex-direction:column;gap:16px;}
+
+/* STORAGE STATUS BANNER */
+.storage-banner{background:var(--amber-light);border:1.5px solid var(--amber);border-radius:var(--radius);padding:12px 16px;font-size:0.74rem;color:var(--amber);line-height:1.5;display:none;align-items:center;gap:10px;}
+.storage-banner.visible{display:flex;}
 
 /* GEO ALERT */
 .geo-alert{background:var(--red-light);border:1.5px solid var(--red);border-radius:var(--radius);padding:14px 18px;display:none;align-items:center;gap:12px;animation:shake 0.4s ease;}
@@ -82,24 +70,26 @@ body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);mi
 .timer-label{font-size:0.65rem;letter-spacing:0.15em;color:var(--ink-muted);text-transform:uppercase;margin-bottom:10px;}
 .timer-display{font-size:4rem;font-weight:300;letter-spacing:-0.03em;line-height:1;margin-bottom:6px;transition:color 0.3s;}
 .timer-display.running{color:var(--accent);}
-.timer-display.paused {color:var(--amber);}
+.timer-display.paused{color:var(--amber);}
 .timer-display.outside{color:var(--red);}
-
-/* Date label under timer */
 .timer-date-label{font-family:'Playfair Display',serif;font-size:1rem;color:var(--ink-light);margin-bottom:4px;font-weight:600;}
 .timer-sub{font-size:0.72rem;color:var(--ink-muted);margin-bottom:6px;min-height:1.2em;}
 .geo-status-line{font-size:0.7rem;margin-bottom:24px;min-height:1.1em;display:flex;align-items:center;justify-content:center;gap:6px;}
 .geo-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
-.geo-dot.inside {background:var(--green);}
+.geo-dot.inside{background:var(--green);}
 .geo-dot.outside{background:var(--red);animation:blink 1s infinite;}
-.geo-dot.idle   {background:var(--ink-muted);}
-
+.geo-dot.idle{background:var(--ink-muted);}
 .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* ACCURACY BADGE */
+.acc-badge{font-size:0.62rem;color:var(--ink-muted);margin-top:4px;margin-bottom:0;}
+.acc-badge.good{color:var(--green);}
+.acc-badge.poor{color:var(--amber);}
 
 /* BUTTONS */
 .btn{padding:13px 22px;border-radius:9px;border:none;font-family:'DM Mono',monospace;font-size:0.78rem;font-weight:500;letter-spacing:0.07em;cursor:pointer;transition:all 0.18s;text-transform:uppercase;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
 .btn-primary{background:var(--accent);color:white;}
-.btn-primary:hover {background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(200,82,42,0.3);}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(200,82,42,0.3);}
 .btn-primary:active{transform:scale(0.97);}
 .btn-secondary{background:var(--cream);color:var(--ink);border:1.5px solid var(--border);}
 .btn-secondary:hover{border-color:var(--ink-light);background:var(--border);}
@@ -119,6 +109,8 @@ body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);mi
 .fence-info-icon{font-size:1.1rem;}
 .fence-info-text{font-size:0.72rem;color:var(--ink-light);line-height:1.5;}
 .fence-info-text strong{color:var(--green);}
+.accuracy-tip{margin-top:10px;font-size:0.68rem;color:var(--ink-muted);background:var(--blue-light, #CAD5F0);border-radius:8px;padding:10px 12px;line-height:1.6;display:none;}
+.accuracy-tip.visible{display:block;}
 
 /* STATS */
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
@@ -144,47 +136,28 @@ body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);mi
 .empty-state{text-align:center;padding:40px 20px;color:var(--ink-muted);font-size:0.78rem;border:1.5px dashed var(--border);border-radius:var(--radius);background:var(--white);line-height:1.8;}
 .empty-icon{font-size:2rem;margin-bottom:10px;opacity:0.45;}
 
+/* CLEAR ALL */
+.btn-clear-all{font-size:0.64rem;padding:5px 10px;background:none;border:1px solid var(--red-light);color:var(--red);border-radius:6px;cursor:pointer;font-family:'DM Mono',monospace;letter-spacing:0.05em;transition:background 0.2s;}
+.btn-clear-all:hover{background:var(--red-light);}
+
 /* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--ink);color:white;padding:11px 22px;border-radius:8px;font-size:0.76rem;letter-spacing:0.04em;z-index:999;transition:transform 0.28s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;max-width:calc(100vw - 40px);text-align:center;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
-/* ── MOBILE MEDIA QUERIES ── */
-@media (max-width:360px){
-  .header{padding:12px 14px;} .logo{font-size:1.1rem;}
-  .status-pill{font-size:0.6rem;padding:4px 9px;}
-  .container{padding:12px 12px 32px;gap:12px;}
-  .timer-display{font-size:2.6rem;} .timer-card{padding:22px 14px 18px;}
-  .btn{padding:12px 14px;font-size:0.72rem;} .controls{gap:7px;}
-  .stats-row{grid-template-columns:1fr 1fr;}
-  .stats-row .stat-card:last-child{grid-column:1/-1;}
-  .stat-value{font-size:1.1rem;}
-  .session-item{grid-template-columns:1fr auto;} .session-delete{display:none;}
-  .geofence-row{grid-template-columns:1fr;} .geofence-row .btn{width:100%;}
-}
-@media (max-width:480px){
-  .header{padding:13px 16px;} .logo{font-size:1.2rem;}
+@media(max-width:480px){
+  .header{padding:13px 16px;}.logo{font-size:1.2rem;}
   .container{padding:16px 14px 40px;gap:14px;}
-  .timer-display{font-size:3rem;} .timer-card{padding:26px 18px 22px;}
-  .controls{gap:8px;} .btn{padding:12px 18px;font-size:0.74rem;}
+  .timer-display{font-size:3rem;}.timer-card{padding:26px 18px 22px;}
+  .controls{gap:8px;}.btn{padding:12px 18px;font-size:0.74rem;}
   .stats-row{grid-template-columns:1fr 1fr;}
   .stats-row .stat-card:last-child{grid-column:1/-1;}
-  .session-item{grid-template-columns:1fr auto;} .session-delete{display:none;}
+  .session-item{grid-template-columns:1fr auto;}.session-delete{display:none;}
 }
-@media (min-width:481px) and (max-width:768px){
-  .container{padding:20px 18px 44px;}
-  .timer-display{font-size:3.8rem;}
-  .stats-row{grid-template-columns:repeat(3,1fr);}
+@media(max-width:360px){
+  .timer-display{font-size:2.6rem;}
+  .geofence-row{grid-template-columns:1fr;}.geofence-row .btn{width:100%;}
 }
-@media (min-width:769px){
-  .timer-display{font-size:4.5rem;}
-}
-@media (max-height:500px) and (orientation:landscape){
-  .timer-card{padding:14px 20px 16px;}
-  .timer-display{font-size:2.4rem;margin-bottom:3px;}
-  .timer-sub,.geo-status-line{margin-bottom:8px;}
-  .container{gap:10px;padding:10px 16px;}
-}
-@supports (padding-bottom:env(safe-area-inset-bottom)){
+@supports(padding-bottom:env(safe-area-inset-bottom)){
   .container{padding-bottom:calc(48px + env(safe-area-inset-bottom));}
   .toast{bottom:calc(24px + env(safe-area-inset-bottom));}
 }
@@ -192,25 +165,21 @@ body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);mi
 </head>
 <body>
 
-<!-- LOCATION PERMISSION OVERLAY -->
 <div class="perm-overlay" id="permOverlay">
   <div class="perm-card">
     <div class="perm-icon">📍</div>
     <div class="perm-title">Location Access Needed</div>
     <div class="perm-desc">
       WorkTrack uses your GPS to set your <strong>work zone</strong> and automatically
-      pause the timer when you leave — and resume when you return.
-      <br><br>Your location is never stored on any server.
+      pause the timer when you leave — and resume when you return.<br><br>
+      Your location is never stored on any server.
     </div>
     <button class="perm-btn" onclick="requestPermission()">Allow Location Access</button>
     <span class="perm-skip" onclick="skipPermission()">Skip for now</span>
-    <div class="perm-denied" id="permDenied">
-      ⚠️ Permission was denied. Please enable Location in your browser settings, then reload the page.
-    </div>
+    <div class="perm-denied" id="permDenied"></div>
   </div>
 </div>
 
-<!-- HEADER -->
 <div class="header">
   <div class="logo">Work<span>Track</span></div>
   <div class="status-pill" id="statusPill">
@@ -220,6 +189,11 @@ body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);mi
 </div>
 
 <div class="container">
+
+  <!-- Storage warning -->
+  <div class="storage-banner" id="storageBanner">
+    ⚠️ <span id="storageBannerMsg">Persistent storage unavailable — sessions may not survive reload.</span>
+  </div>
 
   <!-- Zone-left alert -->
   <div class="geo-alert" id="geoAlert">
@@ -236,7 +210,8 @@ body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);mi
     <div class="timer-display" id="timerDisplay">00:00:00</div>
     <div class="timer-date-label" id="timerDateLabel"></div>
     <div class="timer-sub" id="timerSub">—</div>
-    <div class="geo-status-line">
+    <div class="acc-badge" id="accBadge"></div>
+    <div class="geo-status-line" style="margin-top:8px;">
       <span class="geo-dot idle" id="geoDot"></span>
       <span id="geoStatusText" style="color:var(--ink-muted)">Set up work zone below</span>
     </div>
@@ -250,13 +225,18 @@ body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);mi
   <!-- Geofence setup -->
   <div class="geofence-card">
     <div class="card-title">📍 Work Zone Setup</div>
-    <div class="card-sub">Stand at your work location and tap "Set Zone". Timer auto-pauses when you leave and resumes when you return.</div>
+    <div class="card-sub">Stand at your work location and tap "Set Zone". Timer auto-pauses when you leave and resumes when you return. Use ≥20m radius for best GPS accuracy.</div>
     <div class="geofence-row">
       <div>
-        <div class="field-label">Radius (meters)</div>
-        <input type="number" class="radius-input" id="radiusInput" value="100" min="20" max="5000">
+        <div class="field-label">Radius (meters) — min 5m</div>
+        <input type="number" class="radius-input" id="radiusInput" value="20" min="5" max="5000">
       </div>
       <button class="btn btn-primary" onclick="setWorkZone()" id="btnSetZone" style="white-space:nowrap">📌 Set Zone</button>
+    </div>
+    <div class="accuracy-tip" id="accuracyTip">
+      📡 <strong>GPS accuracy tip:</strong> Your GPS accuracy is currently <span id="accTipVal">—</span>. 
+      For reliable geofencing, your radius should be <strong>larger than your GPS accuracy</strong>. 
+      If accuracy is poor (>20m), move outdoors or wait a moment before setting the zone.
     </div>
     <div class="fence-info" id="fenceInfo" style="display:none">
       <div class="fence-info-icon">✅</div>
@@ -286,7 +266,10 @@ body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);mi
   <!-- Log -->
   <div class="section-header">
     <div class="section-title">Session Log</div>
-    <div class="section-meta" id="sessionCount">0 entries</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="section-meta" id="sessionCount">0 entries</div>
+      <button class="btn-clear-all" id="btnClearAll" onclick="clearAllSessions()" style="display:none">Clear All</button>
+    </div>
   </div>
   <div class="sessions-list" id="sessionsList">
     <div class="empty-state">
@@ -308,60 +291,121 @@ let isPaused         = false;
 let autoGeopaused    = false;
 let sessionStartTime = null;
 
-let workZone        = JSON.parse(localStorage.getItem('wt_zone') || 'null');
+let workZone        = null;
 let locationWatchId = null;
 let insideZone      = null;
 let locationGranted = false;
+let lastAccuracy    = null;
 
-let sessions = JSON.parse(localStorage.getItem('wt_sessions') || '[]');
+// Rolling smoothed distance to reduce jitter
+let distanceBuffer  = [];
+const DIST_BUFFER_SIZE = 3; // average last 3 readings
 
-// ── PERMISSION OVERLAY ─────────────────────────────
+let sessions = [];
+let storageAvailable = false;
+
+// ── PERSISTENT STORAGE (window.storage API) ────────
+async function initStorage() {
+  try {
+    // Test if window.storage exists
+    if (!window.storage) throw new Error('No storage API');
+    
+    // Load zone
+    const zoneResult = await window.storage.get('wt_zone').catch(() => null);
+    if (zoneResult && zoneResult.value) {
+      workZone = JSON.parse(zoneResult.value);
+    }
+    
+    // Load sessions
+    const sessResult = await window.storage.get('wt_sessions').catch(() => null);
+    if (sessResult && sessResult.value) {
+      sessions = JSON.parse(sessResult.value);
+    }
+
+    storageAvailable = true;
+  } catch(e) {
+    // Fallback to localStorage
+    console.warn('window.storage unavailable, using localStorage', e);
+    try {
+      const z = localStorage.getItem('wt_zone');
+      if (z) workZone = JSON.parse(z);
+      const s = localStorage.getItem('wt_sessions');
+      if (s) sessions = JSON.parse(s);
+      storageAvailable = false;
+      document.getElementById('storageBanner').classList.add('visible');
+      document.getElementById('storageBannerMsg').textContent =
+        '⚠️ Using fallback storage — data may not persist across all reloads in this environment.';
+    } catch(le) {
+      sessions = [];
+    }
+  }
+}
+
+async function saveSessions() {
+  try {
+    if (storageAvailable && window.storage) {
+      await window.storage.set('wt_sessions', JSON.stringify(sessions));
+    } else {
+      localStorage.setItem('wt_sessions', JSON.stringify(sessions));
+    }
+  } catch(e) {
+    console.error('Save failed', e);
+  }
+}
+
+async function saveZone() {
+  try {
+    if (storageAvailable && window.storage) {
+      await window.storage.set('wt_zone', JSON.stringify(workZone));
+    } else {
+      localStorage.setItem('wt_zone', JSON.stringify(workZone));
+    }
+  } catch(e) {
+    console.error('Zone save failed', e);
+  }
+}
+
+// ── PERMISSION ─────────────────────────────────────
 function requestPermission() {
   if (!navigator.geolocation) {
-    document.getElementById('permDenied').style.display = 'block';
-    document.getElementById('permDenied').textContent = '❌ Geolocation is not supported by your browser.';
+    showDenied('❌ Geolocation not supported by your browser.');
     return;
   }
   navigator.geolocation.getCurrentPosition(
     pos => {
       locationGranted = true;
+      lastAccuracy = pos.coords.accuracy;
       closeOverlay();
       showToast('📍 Location access granted');
+      updateAccuracyBadge(pos.coords.accuracy);
       if (workZone) startWatching();
       else showToast('👆 Now set your work zone below');
     },
     err => {
-      const denied = document.getElementById('permDenied');
-      denied.style.display = 'block';
-      if (err.code === 1) {
-        denied.textContent = '⚠️ Permission denied. Enable Location in browser settings and reload.';
-      } else {
-        denied.textContent = '⚠️ Could not get location. Check GPS and try again.';
-      }
+      if (err.code === 1) showDenied('⚠️ Permission denied. Enable Location in browser settings and reload.');
+      else showDenied('⚠️ Could not get location. Check GPS and try again.');
     },
     { enableHighAccuracy: true, timeout: 15000 }
   );
 }
-
-function skipPermission() {
-  closeOverlay();
-  showToast('⚠️ Location skipped — geofence disabled');
+function showDenied(msg) {
+  const d = document.getElementById('permDenied');
+  d.style.display = 'block'; d.textContent = msg;
 }
-
+function skipPermission() { closeOverlay(); showToast('⚠️ Location skipped — geofence disabled'); }
 function closeOverlay() {
   const o = document.getElementById('permOverlay');
   o.classList.add('hidden');
   setTimeout(() => o.style.display = 'none', 300);
 }
 
-// ── LIVE DATE LABEL ────────────────────────────────
+// ── DATE LABEL ─────────────────────────────────────
 function updateDateLabel() {
-  const now = new Date();
   document.getElementById('timerDateLabel').textContent =
-    now.toLocaleDateString([], { weekday:'long', month:'long', day:'numeric' });
+    new Date().toLocaleDateString([], { weekday:'long', month:'long', day:'numeric' });
 }
 updateDateLabel();
-setInterval(updateDateLabel, 60000); // refresh every minute
+setInterval(updateDateLabel, 60000);
 
 // ── TIMER ──────────────────────────────────────────
 function startTimer() {
@@ -408,13 +452,12 @@ function doPause(byGeo) {
   else        { isPaused = true; autoGeopaused = false; setUI('paused'); }
 }
 
-function stopTimer() {
+async function stopTimer() {
   if (!isRunning && !isPaused && !autoGeopaused) return;
   clearInterval(timerInterval);
   const totalMs = pausedElapsed + (isRunning ? Date.now() - startTimestamp : 0);
   const endTime = new Date();
 
-  // Record uses full date+time, no project name
   sessions.unshift({
     id: Date.now(),
     start: sessionStartTime.toISOString(),
@@ -422,7 +465,8 @@ function stopTimer() {
     duration: totalMs,
     zone: workZone ? { lat:workZone.lat, lng:workZone.lng, radius:workZone.radius } : null
   });
-  saveSessions(); renderSessions(); updateStats();
+  await saveSessions();
+  renderSessions(); updateStats();
 
   isRunning = false; isPaused = false; autoGeopaused = false;
   pausedElapsed = 0; startTimestamp = null; sessionStartTime = null;
@@ -478,42 +522,76 @@ function setUI(state) {
 }
 
 // ── GEOFENCE ───────────────────────────────────────
-function setWorkZone() {
+async function setWorkZone() {
   if (!navigator.geolocation) { showToast('Geolocation not supported'); return; }
   const btn = document.getElementById('btnSetZone');
   btn.disabled = true; btn.textContent = '📡 Getting GPS...';
 
   navigator.geolocation.getCurrentPosition(pos => {
-    const radius = Math.max(20, parseInt(document.getElementById('radiusInput').value) || 100);
-    workZone = { lat: pos.coords.latitude, lng: pos.coords.longitude, radius };
-    localStorage.setItem('wt_zone', JSON.stringify(workZone));
+    const radius = Math.max(5, parseInt(document.getElementById('radiusInput').value) || 20);
+    workZone = { lat: pos.coords.latitude, lng: pos.coords.longitude, radius, accuracy: pos.coords.accuracy };
+    saveZone();
     btn.disabled = false; btn.textContent = '📌 Update Zone';
+
     const info = document.getElementById('fenceInfo');
     info.style.display = 'flex';
     document.getElementById('fenceInfoText').innerHTML =
-      `<strong>Zone locked!</strong> ${workZone.lat.toFixed(5)}, ${workZone.lng.toFixed(5)} · Radius: ${radius}m`;
-    showToast('✅ Work zone set (' + radius + 'm radius)');
+      `<strong>Zone locked!</strong> ${workZone.lat.toFixed(5)}, ${workZone.lng.toFixed(5)} · Radius: ${radius}m · GPS accuracy: ±${Math.round(pos.coords.accuracy)}m`;
+
+    // Warn if radius < GPS accuracy (unreliable)
+    const tip = document.getElementById('accuracyTip');
+    if (pos.coords.accuracy > radius) {
+      document.getElementById('accTipVal').textContent = `±${Math.round(pos.coords.accuracy)}m`;
+      tip.classList.add('visible');
+    } else {
+      tip.classList.remove('visible');
+    }
+
+    showToast('✅ Work zone set (' + radius + 'm radius, GPS ±' + Math.round(pos.coords.accuracy) + 'm)');
+    distanceBuffer = [];
     startWatching();
   }, err => {
     btn.disabled = false; btn.textContent = '📌 Set Zone';
     showToast('❌ ' + (err.code === 1 ? 'Location permission denied' : 'GPS error — try again'));
-  }, { enableHighAccuracy: true, timeout: 12000 });
+  }, { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 });
 }
 
 function startWatching() {
   if (locationWatchId !== null) navigator.geolocation.clearWatch(locationWatchId);
   if (!navigator.geolocation) return;
-  locationWatchId = navigator.geolocation.watchPosition(pos => {
-    if (workZone) checkFence({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-  }, () => {}, { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
+  locationWatchId = navigator.geolocation.watchPosition(
+    pos => {
+      lastAccuracy = pos.coords.accuracy;
+      updateAccuracyBadge(pos.coords.accuracy);
+      if (workZone) checkFence({ lat: pos.coords.latitude, lng: pos.coords.longitude }, pos.coords.accuracy);
+    },
+    err => { console.warn('Watch error', err); },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 0,        // always fresh — no stale cache
+      timeout: 20000
+    }
+  );
 }
 
-function checkFence(pos) {
+function checkFence(pos, accuracy) {
   if (!workZone) return;
-  const dist = haversine(pos.lat, pos.lng, workZone.lat, workZone.lng);
-  const nowIn = dist <= workZone.radius;
-  updateGeoLine(nowIn, dist);
-  if (nowIn === insideZone) return;
+  const raw = haversine(pos.lat, pos.lng, workZone.lat, workZone.lng);
+
+  // Rolling average to smooth GPS jitter
+  distanceBuffer.push(raw);
+  if (distanceBuffer.length > DIST_BUFFER_SIZE) distanceBuffer.shift();
+  const dist = distanceBuffer.reduce((a,b)=>a+b,0) / distanceBuffer.length;
+
+  // Effective boundary = zone radius + half of GPS accuracy (buffer for uncertainty)
+  // This makes it less likely to falsely trigger near the edge
+  const accuracyBuffer = accuracy ? Math.min(accuracy * 0.5, workZone.radius * 0.5) : 0;
+  const effectiveRadius = workZone.radius + accuracyBuffer;
+
+  const nowIn = dist <= effectiveRadius;
+  updateGeoLine(nowIn, dist, accuracy);
+
+  if (nowIn === insideZone) return; // no state change
   const prev = insideZone;
   insideZone = nowIn;
 
@@ -536,19 +614,28 @@ function checkFence(pos) {
   }
 }
 
-function updateGeoLine(inside, dist) {
+function updateGeoLine(inside, dist, accuracy) {
   const dot  = document.getElementById('geoDot');
   const text = document.getElementById('geoStatusText');
-  const dStr = dist < 1000 ? Math.round(dist) + 'm' : (dist / 1000).toFixed(2) + 'km';
+  const dStr = dist < 1000 ? Math.round(dist) + 'm' : (dist/1000).toFixed(2) + 'km';
+  const accStr = accuracy ? ` · GPS ±${Math.round(accuracy)}m` : '';
   if (inside) {
     dot.className = 'geo-dot inside';
     text.style.color = 'var(--green)';
-    text.textContent = '✓ Inside work zone · ' + dStr + ' from center';
+    text.textContent = `✓ Inside zone · ${dStr} from center${accStr}`;
   } else {
     dot.className = 'geo-dot outside';
     text.style.color = 'var(--red)';
-    text.textContent = '✗ Outside zone · ' + dStr + ' away (limit: ' + workZone.radius + 'm)';
+    text.textContent = `✗ Outside zone · ${dStr} away (limit: ${workZone.radius}m)${accStr}`;
   }
+}
+
+function updateAccuracyBadge(accuracy) {
+  const badge = document.getElementById('accBadge');
+  if (!accuracy) { badge.textContent = ''; return; }
+  const rounded = Math.round(accuracy);
+  badge.textContent = `GPS accuracy: ±${rounded}m`;
+  badge.className = 'acc-badge ' + (rounded <= 10 ? 'good' : rounded <= 30 ? '' : 'poor');
 }
 
 function haversine(lat1, lng1, lat2, lng2) {
@@ -558,7 +645,7 @@ function haversine(lat1, lng1, lat2, lng2) {
 }
 function vibrate(p) { if ('vibrate' in navigator) navigator.vibrate(p); }
 
-// ── BACKGROUND ─────────────────────────────────────
+// ── BACKGROUND HANDLING ────────────────────────────
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && isRunning) tick();
 });
@@ -574,14 +661,16 @@ document.addEventListener('visibilitychange', async () => {
 // ── SESSIONS ───────────────────────────────────────
 function sessionLabel(isoDate) {
   const d = new Date(isoDate);
-  // e.g. "Monday, 05 Mar 2026"
   return d.toLocaleDateString([], { weekday:'long', day:'2-digit', month:'short', year:'numeric' });
 }
 
 function renderSessions() {
   const list = document.getElementById('sessionsList');
-  document.getElementById('sessionCount').textContent = sessions.length + ' entr' + (sessions.length === 1 ? 'y' : 'ies');
-  if (!sessions.length) {
+  const count = sessions.length;
+  document.getElementById('sessionCount').textContent = count + ' entr' + (count===1?'y':'ies');
+  document.getElementById('btnClearAll').style.display = count > 0 ? 'block' : 'none';
+
+  if (!count) {
     list.innerHTML = `<div class="empty-state"><div class="empty-icon">⏱</div>No sessions yet.<br>Allow location, set your work zone, then clock in.</div>`;
     return;
   }
@@ -603,12 +692,20 @@ function renderSessions() {
   }).join('');
 }
 
-function deleteSession(id) {
+async function deleteSession(id) {
   sessions = sessions.filter(s => s.id !== id);
-  saveSessions(); renderSessions(); updateStats();
+  await saveSessions();
+  renderSessions(); updateStats();
   showToast('Session deleted');
 }
-function saveSessions() { localStorage.setItem('wt_sessions', JSON.stringify(sessions)); }
+
+async function clearAllSessions() {
+  if (!confirm('Delete all sessions? This cannot be undone.')) return;
+  sessions = [];
+  await saveSessions();
+  renderSessions(); updateStats();
+  showToast('All sessions cleared');
+}
 
 function updateStats() {
   const now = new Date(), todayStr = now.toDateString();
@@ -622,7 +719,7 @@ function updateStats() {
     if (d >= wk) weekMs += s.duration;
   });
   document.getElementById('statToday').textContent  = formatDuration(todayMs);
-  document.getElementById('statTodaySub').textContent = todayN + ' session' + (todayN !== 1 ? 's' : '');
+  document.getElementById('statTodaySub').textContent = todayN + ' session' + (todayN!==1?'s':'');
   document.getElementById('statWeek').textContent   = formatDuration(weekMs);
   document.getElementById('statTotal').textContent  = formatDuration(totalMs);
   document.getElementById('statTotalSub').textContent = sessions.length + ' total';
@@ -631,7 +728,7 @@ function updateStats() {
 // ── HELPERS ────────────────────────────────────────
 function msToHMS(ms) {
   const s = Math.floor(ms/1000);
-  return [Math.floor(s/3600), Math.floor(s%3600/60), s%60].map(v => String(v).padStart(2,'0')).join(':');
+  return [Math.floor(s/3600), Math.floor(s%3600/60), s%60].map(v=>String(v).padStart(2,'0')).join(':');
 }
 function formatDuration(ms) {
   const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60);
@@ -641,32 +738,35 @@ let toastT;
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2800);
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2800);
 }
 
 // ── INIT ───────────────────────────────────────────
-renderSessions(); updateStats();
+(async () => {
+  await initStorage();
+  renderSessions();
+  updateStats();
 
-// Check if permission already granted (Chrome Permissions API)
-if (navigator.permissions) {
-  navigator.permissions.query({ name: 'geolocation' }).then(result => {
-    if (result.state === 'granted') {
-      locationGranted = true;
-      closeOverlay();
-      if (workZone) startWatching();
-    }
-    // If 'prompt' → show overlay. If 'denied' → overlay stays, user sees skip.
-  });
-}
+  // Restore zone UI
+  if (workZone) {
+    document.getElementById('fenceInfo').style.display = 'flex';
+    document.getElementById('fenceInfoText').innerHTML =
+      `<strong>Zone active</strong> ${workZone.lat.toFixed(5)}, ${workZone.lng.toFixed(5)} · Radius: ${workZone.radius}m`;
+    document.getElementById('radiusInput').value = workZone.radius;
+    document.getElementById('btnSetZone').textContent = '📌 Update Zone';
+  }
 
-// Restore saved zone UI
-if (workZone) {
-  document.getElementById('fenceInfo').style.display = 'flex';
-  document.getElementById('fenceInfoText').innerHTML =
-    `<strong>Zone active</strong> ${workZone.lat.toFixed(5)}, ${workZone.lng.toFixed(5)} · Radius: ${workZone.radius}m`;
-  document.getElementById('radiusInput').value = workZone.radius;
-  document.getElementById('btnSetZone').textContent = '📌 Update Zone';
-}
+  // Check geolocation permission state
+  if (navigator.permissions) {
+    navigator.permissions.query({ name: 'geolocation' }).then(result => {
+      if (result.state === 'granted') {
+        locationGranted = true;
+        closeOverlay();
+        if (workZone) startWatching();
+      }
+    }).catch(()=>{});
+  }
+})();
 </script>
 </body>
 </html>
