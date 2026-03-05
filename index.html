@@ -298,8 +298,13 @@ let locationGranted = false;
 let lastAccuracy    = null;
 
 // Rolling smoothed distance to reduce jitter
-let distanceBuffer  = [];
-const DIST_BUFFER_SIZE = 3; // average last 3 readings
+let distanceBuffer   = [];
+const DIST_BUFFER_SIZE = 4; // average last 4 readings for smooth distance display
+
+// Consecutive outside count — must be outside N readings in a row to trigger pause
+// Prevents a single bad GPS ping from pausing the timer
+let outsideCount     = 0;
+const OUTSIDE_CONFIRM = 2; // require 2 consecutive outside readings
 
 let sessions = [];
 let storageAvailable = false;
@@ -549,6 +554,7 @@ async function setWorkZone() {
 
     showToast('✅ Work zone set (' + radius + 'm radius, GPS ±' + Math.round(pos.coords.accuracy) + 'm)');
     distanceBuffer = [];
+    outsideCount = 0;
     startWatching();
   }, err => {
     btn.disabled = false; btn.textContent = '📌 Set Zone';
@@ -578,18 +584,27 @@ function checkFence(pos, accuracy) {
   if (!workZone) return;
   const raw = haversine(pos.lat, pos.lng, workZone.lat, workZone.lng);
 
-  // Rolling average to smooth GPS jitter
+  // Rolling average for smooth display only (not for decision)
   distanceBuffer.push(raw);
   if (distanceBuffer.length > DIST_BUFFER_SIZE) distanceBuffer.shift();
-  const dist = distanceBuffer.reduce((a,b)=>a+b,0) / distanceBuffer.length;
+  const smoothDist = distanceBuffer.reduce((a,b)=>a+b,0) / distanceBuffer.length;
 
-  // Effective boundary = zone radius + half of GPS accuracy (buffer for uncertainty)
-  // This makes it less likely to falsely trigger near the edge
-  const accuracyBuffer = accuracy ? Math.min(accuracy * 0.5, workZone.radius * 0.5) : 0;
-  const effectiveRadius = workZone.radius + accuracyBuffer;
+  // STRICT radius — no accuracy expansion. The radius you set is exactly what is used.
+  const strictlyInside = raw <= workZone.radius;
 
-  const nowIn = dist <= effectiveRadius;
-  updateGeoLine(nowIn, dist, accuracy);
+  // For exiting: require OUTSIDE_CONFIRM consecutive outside readings to avoid
+  // a single bad GPS ping pausing the timer. For entering: instant (1 reading).
+  if (strictlyInside) {
+    outsideCount = 0; // reset exit counter as soon as we're back inside
+  } else {
+    outsideCount++;
+  }
+
+  // Determine confirmed state
+  const confirmedOutside = outsideCount >= OUTSIDE_CONFIRM;
+  const nowIn = strictlyInside || !confirmedOutside; // inside OR not yet confirmed outside
+
+  updateGeoLine(strictlyInside, raw, smoothDist, accuracy);
 
   if (nowIn === insideZone) return; // no state change
   const prev = insideZone;
@@ -601,6 +616,7 @@ function checkFence(pos, accuracy) {
     vibrate([200, 100, 200]);
   }
   if (nowIn && autoGeopaused) {
+    outsideCount = 0;
     startTimestamp = Date.now();
     isRunning = true; autoGeopaused = false;
     timerInterval = setInterval(tick, 500);
@@ -614,19 +630,20 @@ function checkFence(pos, accuracy) {
   }
 }
 
-function updateGeoLine(inside, dist, accuracy) {
+function updateGeoLine(strictlyInside, rawDist, smoothDist, accuracy) {
   const dot  = document.getElementById('geoDot');
   const text = document.getElementById('geoStatusText');
-  const dStr = dist < 1000 ? Math.round(dist) + 'm' : (dist/1000).toFixed(2) + 'km';
+  const dStr = rawDist < 1000 ? Math.round(rawDist) + 'm' : (rawDist/1000).toFixed(2) + 'km';
   const accStr = accuracy ? ` · GPS ±${Math.round(accuracy)}m` : '';
-  if (inside) {
+  if (strictlyInside) {
     dot.className = 'geo-dot inside';
     text.style.color = 'var(--green)';
     text.textContent = `✓ Inside zone · ${dStr} from center${accStr}`;
   } else {
     dot.className = 'geo-dot outside';
     text.style.color = 'var(--red)';
-    text.textContent = `✗ Outside zone · ${dStr} away (limit: ${workZone.radius}m)${accStr}`;
+    const confirm = outsideCount < OUTSIDE_CONFIRM ? ` (confirming… ${outsideCount}/${OUTSIDE_CONFIRM})` : '';
+    text.textContent = `✗ Outside zone · ${dStr} away (limit: ${workZone.radius}m)${accStr}${confirm}`;
   }
 }
 
