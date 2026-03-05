@@ -7,42 +7,38 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="WorkTrack">
-<meta name="theme-color" content="#0F0E0C">
+<meta name="theme-color" content="#F7F4F0">
 <title>WorkTrack</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
-  --bg:#0F0E0C; --surface:#1A1916; --surface2:#242220; --surface3:#2E2B28;
-  --border:#3A3630; --border2:#4A4640;
-  --text:#F2EDE6; --text2:#B8B0A6; --text3:#7A7268;
-  --accent:#E8823A; --accent2:#F0A060; --accent-dim:#3A2010;
-  --green:#4CAF7A; --green-dim:#0F2A1A;
-  --amber:#E8B840; --amber-dim:#2A2008;
-  --red:#E84040; --red-dim:#2A0808;
-  --blue:#4A9EE8; --blue-dim:#0A1A2A;
+  --bg:#F7F4F0; --surface:#FFFFFF; --surface2:#F0EDE8; --surface3:#E8E4DE;
+  --border:#DDD9D2; --border2:#C8C3BB;
+  --text:#1A1714; --text2:#5A5550; --text3:#9A9590;
+  --accent:#C8521A; --accent2:#E07040; --accent-dim:#FDE8DC;
+  --green:#1A7A40; --green-dim:#E0F4EA; --green-mid:#2A9A54;
+  --amber:#A86010; --amber-dim:#FEF3DC; --amber-mid:#C87820;
+  --red:#C02020; --red-dim:#FDEAEA; --red-mid:#E03030;
+  --blue:#1A60A8; --blue-dim:#E0EEFE;
+  --shadow:rgba(26,23,20,0.07);
   --r:12px; --r-sm:7px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html{scroll-behavior:smooth;}
 body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;overflow-x:hidden;}
 
-/* ── NAV TABS ── */
-.nav{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200;}
-.nav-tab{flex:1;padding:14px 8px;border:none;background:none;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:0.67rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:6px;}
+.nav{display:flex;background:var(--surface);border-bottom:1.5px solid var(--border);position:sticky;top:0;z-index:200;box-shadow:0 2px 12px var(--shadow);}
+.nav-tab{flex:1;padding:14px 8px;border:none;background:none;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:0.67rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border-bottom:2.5px solid transparent;display:flex;align-items:center;justify-content:center;gap:6px;}
 .nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .nav-tab:hover:not(.active){color:var(--text2);}
-.nav-badge{background:var(--accent);color:white;border-radius:10px;padding:1px 6px;font-size:0.58rem;font-weight:600;min-width:18px;text-align:center;}
 
-/* ── PAGES ── */
-.page{display:none;} .page.active{display:block;}
-
-/* ── CONTAINER ── */
+.page{display:none;}.page.active{display:block;}
 .container{max-width:700px;margin:0 auto;padding:20px 16px 80px;}
 
-/* ── PERM OVERLAY ── */
-.perm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);transition:opacity 0.3s;}
+.perm-overlay{position:fixed;inset:0;background:rgba(26,23,20,0.45);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);transition:opacity 0.3s;}
 .perm-overlay.hidden{opacity:0;pointer-events:none;}
-.perm-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px 24px;max-width:340px;width:100%;text-align:center;animation:popIn 0.3s cubic-bezier(.34,1.56,.64,1);}
+.perm-card{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:32px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(26,23,20,0.18);animation:popIn 0.3s cubic-bezier(.34,1.56,.64,1);}
 @keyframes popIn{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)}}
 .perm-icon{font-size:2.8rem;margin-bottom:12px;}
 .perm-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--text);margin-bottom:8px;}
@@ -50,17 +46,16 @@ body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--text
 .perm-btn{width:100%;padding:13px;border-radius:8px;border:none;background:var(--accent);color:white;font-family:'IBM Plex Mono',monospace;font-size:0.76rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;margin-bottom:10px;transition:opacity 0.2s;}
 .perm-btn:hover{opacity:0.85;}
 .perm-skip{font-size:0.68rem;color:var(--text3);cursor:pointer;text-decoration:underline;}
-.perm-denied{background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px 12px;margin-top:12px;font-size:0.7rem;color:var(--amber);line-height:1.6;display:none;text-align:left;}
+.perm-denied{background:var(--amber-dim);border:1px solid var(--amber-mid);border-radius:8px;padding:10px 12px;margin-top:12px;font-size:0.7rem;color:var(--amber);line-height:1.6;display:none;text-align:left;}
 
-/* ── STATUS BAR ── */
-.status-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);}
+.status-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:10px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:0 2px 8px var(--shadow);}
 .status-left{display:flex;align-items:center;gap:8px;}
 .status-dot{width:8px;height:8px;border-radius:50%;}
 .status-dot.idle{background:var(--text3);}
-.status-dot.running{background:var(--green);animation:pulse 1.5s infinite;}
-.status-dot.paused{background:var(--amber);}
-.status-dot.outside{background:var(--red);animation:pulse 1s infinite;}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.85)}}
+.status-dot.running{background:var(--green-mid);animation:pulse 1.5s infinite;}
+.status-dot.paused{background:var(--amber-mid);}
+.status-dot.outside{background:var(--red-mid);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
 .status-label{font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--text2);}
 .status-label.running{color:var(--green);}
 .status-label.paused{color:var(--amber);}
@@ -68,11 +63,10 @@ body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--text
 .status-right{font-size:0.65rem;color:var(--text3);}
 .status-right span{color:var(--text2);}
 
-/* ── TIMER CARD ── */
-.timer-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:28px 20px 22px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden;transition:border-color 0.3s;}
+.timer-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:28px 20px 22px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden;transition:border-color 0.3s;box-shadow:0 4px 20px var(--shadow);}
 .timer-card.running{border-color:var(--accent);}
-.timer-card.outside{border-color:var(--red);}
-.timer-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--amber),var(--accent));background-size:200%;transform:scaleX(0);transform-origin:left;transition:transform 0.5s;}
+.timer-card.outside{border-color:var(--red-mid);}
+.timer-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--amber-mid),var(--accent));background-size:200%;transform:scaleX(0);transform-origin:left;transition:transform 0.5s;}
 .timer-card.running::after{transform:scaleX(1);animation:shimmer 3s linear infinite;}
 @keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
 .timer-date{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.95rem;color:var(--text3);margin-bottom:6px;}
@@ -83,135 +77,116 @@ body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--text
 .timer-session-info{font-size:0.68rem;color:var(--text3);margin-bottom:4px;min-height:1em;}
 .geo-line{font-size:0.67rem;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--text3);margin-bottom:22px;flex-wrap:wrap;}
 .geo-dot-sm{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.geo-dot-sm.inside{background:var(--green);}
-.geo-dot-sm.outside{background:var(--red);animation:pulse 1s infinite;}
+.geo-dot-sm.inside{background:var(--green-mid);}
+.geo-dot-sm.outside{background:var(--red-mid);animation:pulse 1s infinite;}
 .geo-dot-sm.idle{background:var(--text3);}
 .acc-tag{font-size:0.6rem;padding:1px 6px;border-radius:4px;border:1px solid var(--border2);color:var(--text3);background:var(--surface2);}
-.acc-tag.warn{color:var(--amber);border-color:var(--amber);background:var(--amber-dim);}
+.acc-tag.warn{color:var(--amber);border-color:var(--amber-mid);background:var(--amber-dim);}
 
-/* ── CONTROLS ── */
 .controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
 .btn{padding:11px 18px;border-radius:var(--r-sm);border:none;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;font-weight:500;letter-spacing:0.08em;cursor:pointer;transition:all 0.16s;text-transform:uppercase;touch-action:manipulation;}
-.btn-primary{background:var(--accent);color:white;}
-.btn-primary:hover{opacity:0.85;transform:translateY(-1px);}
-.btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
-.btn-secondary:hover{border-color:var(--text3);color:var(--text);}
-.btn-danger{background:var(--surface2);color:var(--accent);border:1px solid var(--accent-dim);}
+.btn-primary{background:var(--accent);color:white;box-shadow:0 2px 8px rgba(200,82,26,0.25);}
+.btn-primary:hover{opacity:0.88;transform:translateY(-1px);}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1.5px solid var(--border);}
+.btn-secondary:hover{border-color:var(--border2);background:var(--surface3);}
+.btn-danger{background:white;color:var(--accent);border:1.5px solid var(--accent-dim);}
 .btn-danger:hover{background:var(--accent-dim);}
-.btn:disabled{opacity:0.28;cursor:not-allowed;transform:none!important;}
+.btn:disabled{opacity:0.28;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
 .btn:active{transform:scale(0.96)!important;}
 
-/* ── GEO ALERT ── */
-.geo-alert{background:var(--red-dim);border:1px solid var(--red);border-radius:var(--r);padding:12px 16px;display:none;align-items:center;gap:10px;margin-bottom:14px;animation:shake 0.4s;}
+.geo-alert{background:var(--red-dim);border:1.5px solid var(--red-mid);border-radius:var(--r);padding:12px 16px;display:none;align-items:center;gap:10px;margin-bottom:14px;animation:shake 0.4s;}
 .geo-alert.visible{display:flex;}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .geo-alert-text{font-size:0.74rem;color:var(--red);line-height:1.5;}
-.geo-alert-text strong{display:block;font-size:0.78rem;margin-bottom:2px;}
+.geo-alert-text strong{display:block;margin-bottom:2px;}
 
-/* ── ZONE CARD ── */
-.zone-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;}
-.card-head{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--text);margin-bottom:4px;}
+.zone-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px;box-shadow:0 2px 8px var(--shadow);}
+.card-head{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--text);margin-bottom:4px;}
 .card-sub{font-size:0.66rem;color:var(--text3);line-height:1.7;margin-bottom:14px;}
 .zone-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;}
 .field-lbl{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:5px;}
-.num-input{width:100%;padding:9px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:'IBM Plex Mono',monospace;font-size:0.82rem;color:var(--text);background:var(--surface2);outline:none;transition:border-color 0.2s;}
+.num-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r-sm);font-family:'IBM Plex Mono',monospace;font-size:0.82rem;color:var(--text);background:var(--surface2);outline:none;transition:border-color 0.2s;}
 .num-input:focus{border-color:var(--accent);}
-.zone-info{margin-top:12px;background:var(--green-dim);border:1px solid rgba(76,175,122,0.3);border-radius:8px;padding:10px 12px;font-size:0.68rem;color:var(--green);line-height:1.7;display:none;}
-.zone-info.warn{background:var(--amber-dim);border-color:rgba(232,184,64,0.3);color:var(--amber);}
+.zone-info{margin-top:12px;background:var(--green-dim);border:1px solid rgba(26,122,64,0.25);border-radius:8px;padding:10px 12px;font-size:0.68rem;color:var(--green);line-height:1.7;display:none;}
+.zone-info.warn{background:var(--amber-dim);border-color:rgba(168,96,16,0.3);color:var(--amber);}
 
-/* ── STATS ── */
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
-.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 12px;}
+.stat{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 12px;box-shadow:0 2px 8px var(--shadow);}
 .stat-lbl{font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);margin-bottom:5px;}
 .stat-val{font-size:1.2rem;font-weight:300;color:var(--text);letter-spacing:-0.02em;}
 .stat-sub{font-size:0.6rem;color:var(--text3);margin-top:2px;}
 
-/* ─────────────────────────────────────
-   DAILY REPORT PAGE
-───────────────────────────────────── */
-.report-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:10px;flex-wrap:wrap;}
-.report-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--text);}
-.report-nav{display:flex;align-items:center;gap:6px;}
-.report-nav-btn{padding:6px 10px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text2);font-family:'IBM Plex Mono',monospace;font-size:0.7rem;cursor:pointer;transition:all 0.15s;}
+/* Report */
+.report-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--text);margin-bottom:16px;}
+.report-controls{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.report-nav-btn{padding:7px 12px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--text2);font-family:'IBM Plex Mono',monospace;font-size:0.68rem;cursor:pointer;transition:all 0.15s;}
 .report-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
-.report-date-lbl{font-size:0.72rem;color:var(--text2);min-width:140px;text-align:center;}
+.report-date-lbl{font-size:0.72rem;color:var(--text);background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:7px 14px;min-width:130px;text-align:center;}
+.export-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.btn-export{padding:9px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--text2);font-family:'IBM Plex Mono',monospace;font-size:0.68rem;cursor:pointer;letter-spacing:0.06em;transition:all 0.15s;display:flex;align-items:center;gap:6px;}
+.btn-export:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.btn-export.pdf{background:var(--accent);color:white;border-color:var(--accent);box-shadow:0 2px 8px rgba(200,82,26,0.22);}
+.btn-export.pdf:hover{opacity:0.88;}
 
-/* Day card */
-.day-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden;animation:slideIn 0.25s ease;}
+.day-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:14px;overflow:hidden;box-shadow:0 2px 10px var(--shadow);animation:slideIn 0.25s ease;}
 @keyframes slideIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
-.day-card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;cursor:pointer;user-select:none;}
-.day-card-head:hover .day-toggle{color:var(--accent);}
-.day-date-block{}
+.day-card-head{padding:14px 18px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;cursor:pointer;user-select:none;background:var(--surface2);}
+.day-card-head:hover{background:var(--surface3);}
 .day-weekday{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-style:italic;color:var(--text);}
 .day-fulldate{font-size:0.65rem;color:var(--text3);margin-top:1px;}
-.day-summary{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
-.day-total{font-size:1.1rem;font-weight:300;color:var(--accent);}
+.day-summary{display:flex;align-items:center;gap:14px;}
+.day-total-big{font-size:1.1rem;font-weight:300;color:var(--accent);}
 .day-meta{font-size:0.62rem;color:var(--text3);text-align:right;}
-.day-toggle{font-size:0.8rem;color:var(--text3);transition:transform 0.2s,color 0.2s;flex-shrink:0;}
+.day-toggle{font-size:0.8rem;color:var(--text3);transition:transform 0.2s;}
 .day-card.open .day-toggle{transform:rotate(180deg);}
-
-/* Session inside day */
 .day-body{display:none;padding:0 0 8px;}
 .day-card.open .day-body{display:block;}
-.session-block{padding:12px 18px;border-top:1px solid var(--border);}
-.session-block-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;}
-.session-num{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;}
-.session-gross{font-size:0.8rem;color:var(--text2);}
-.session-net-label{font-size:0.62rem;color:var(--text3);}
-.session-net{font-size:0.9rem;color:var(--green);font-weight:500;}
 
-/* Timeline */
-.timeline{position:relative;padding-left:28px;}
-.timeline::before{content:'';position:absolute;left:9px;top:8px;bottom:8px;width:1px;background:var(--border2);}
-.tl-event{position:relative;margin-bottom:10px;display:flex;align-items:flex-start;gap:10px;}
+.session-block{padding:14px 18px;border-top:1.5px solid var(--border);}
+.session-block-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;}
+.session-num{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;}
+.session-net{font-size:0.9rem;color:var(--green);font-weight:500;}
+.session-net-label{font-size:0.6rem;color:var(--text3);}
+
+.timeline{position:relative;padding-left:26px;}
+.timeline::before{content:'';position:absolute;left:8px;top:8px;bottom:8px;width:1.5px;background:var(--border);}
+.tl-event{position:relative;margin-bottom:10px;}
 .tl-event:last-child{margin-bottom:0;}
-.tl-dot{position:absolute;left:-22px;top:3px;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);flex-shrink:0;}
-.tl-dot.punch-in{background:var(--green);}
-.tl-dot.break-out{background:var(--amber);}
+.tl-dot{position:absolute;left:-20px;top:4px;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);}
+.tl-dot.punch-in{background:var(--green-mid);}
+.tl-dot.break-out{background:var(--amber-mid);}
 .tl-dot.break-in{background:var(--blue);}
-.tl-dot.geo-out{background:var(--red);}
-.tl-dot.geo-in{background:var(--green);}
+.tl-dot.geo-out{background:var(--red-mid);}
+.tl-dot.geo-in{background:var(--green-mid);}
 .tl-dot.punch-out{background:var(--accent);}
-.tl-content{}
-.tl-time{font-size:0.78rem;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums;}
-.tl-label{font-size:0.64rem;color:var(--text3);margin-top:1px;}
+.tl-time{font-size:0.8rem;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
+.tl-label{font-size:0.64rem;color:var(--text2);margin-top:1px;}
 .tl-duration{font-size:0.62rem;color:var(--text3);margin-top:2px;}
 .tl-duration.break-dur{color:var(--amber);}
 
-/* Break summary strip */
-.break-strip{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);}
-.break-chip{background:var(--amber-dim);border:1px solid rgba(232,184,64,0.25);border-radius:5px;padding:3px 8px;font-size:0.62rem;color:var(--amber);}
+.break-strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);}
+.break-chip{background:var(--amber-dim);border:1px solid rgba(168,96,16,0.2);border-radius:5px;padding:3px 8px;font-size:0.62rem;color:var(--amber);}
 .break-chip span{color:var(--text2);margin-left:4px;}
 
-/* Day totals bar */
-.day-totals-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border);}
+.day-totals-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-top:1.5px solid var(--border);}
 .day-total-cell{background:var(--surface2);padding:10px 12px;text-align:center;}
 .day-total-cell-lbl{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:3px;}
 .day-total-cell-val{font-size:0.88rem;font-weight:500;color:var(--text);}
 .day-total-cell-val.green{color:var(--green);}
 .day-total-cell-val.amber{color:var(--amber);}
 
-/* Export button */
-.export-row{display:flex;gap:8px;justify-content:flex-end;margin-bottom:14px;}
-.btn-export{padding:8px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text2);font-family:'IBM Plex Mono',monospace;font-size:0.67rem;cursor:pointer;letter-spacing:0.06em;transition:all 0.15s;}
-.btn-export:hover{border-color:var(--accent);color:var(--accent);}
-
-/* Empty */
-.empty{text-align:center;padding:48px 20px;color:var(--text3);font-size:0.76rem;line-height:2;}
+.empty{text-align:center;padding:48px 20px;color:var(--text3);font-size:0.76rem;line-height:2;border:1.5px dashed var(--border);border-radius:var(--r);background:var(--surface);}
 .empty-icon{font-size:2rem;margin-bottom:12px;opacity:0.4;}
 
-/* Toast */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:10px 20px;border-radius:8px;font-size:0.73rem;z-index:999;transition:transform 0.26s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:calc(100vw - 32px);text-align:center;white-space:nowrap;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--text);color:white;padding:10px 20px;border-radius:8px;font-size:0.73rem;z-index:999;transition:transform 0.26s cubic-bezier(.34,1.56,.64,1);pointer-events:none;max-width:calc(100vw - 32px);text-align:center;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 
-/* Responsive */
 @media(max-width:420px){
   .timer-display{font-size:2.8rem;}
   .stats-row{grid-template-columns:1fr 1fr;}
   .stats-row .stat:last-child{grid-column:1/-1;}
   .zone-row{grid-template-columns:1fr;}.zone-row .btn{width:100%;}
   .day-totals-bar{grid-template-columns:1fr;}
-  .day-summary{gap:8px;}
 }
 @supports(padding-bottom:env(safe-area-inset-bottom)){
   .container{padding-bottom:calc(80px + env(safe-area-inset-bottom));}
@@ -221,28 +196,24 @@ body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--text
 </head>
 <body>
 
-<!-- PERM OVERLAY -->
 <div class="perm-overlay" id="permOverlay">
   <div class="perm-card">
     <div class="perm-icon">📍</div>
     <div class="perm-title">Location Access</div>
-    <div class="perm-desc">WorkTrack needs GPS to define your <strong style="color:var(--text)">work zone</strong> and auto-pause when you leave.</div>
+    <div class="perm-desc">WorkTrack needs GPS to define your <strong>work zone</strong> and auto-pause when you leave.</div>
     <button class="perm-btn" id="permBtn" onclick="requestPermission()">📍 Allow Location</button>
     <span class="perm-skip" onclick="skipPermission()">Skip — use without geofencing</span>
     <div class="perm-denied" id="permDenied"></div>
   </div>
 </div>
 
-<!-- NAV -->
 <div class="nav">
   <button class="nav-tab active" id="tabTrack" onclick="showPage('track')">⏱ Track</button>
   <button class="nav-tab" id="tabReport" onclick="showPage('report')">📋 Daily Report</button>
 </div>
 
-<!-- ══════════ TRACK PAGE ══════════ -->
 <div class="page active" id="pageTrack">
 <div class="container">
-
   <div class="status-bar">
     <div class="status-left">
       <div class="status-dot idle" id="statusDot"></div>
@@ -277,7 +248,7 @@ body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--text
 
   <div class="zone-card">
     <div class="card-head">📍 Work Zone</div>
-    <div class="card-sub">Stand at your work location and tap Set Zone. The timer auto-pauses when you leave and resumes when you return. GPS accuracy is factored in automatically.</div>
+    <div class="card-sub">Stand at your work location and tap Set Zone. Timer auto-pauses when you leave and resumes when you return. GPS accuracy is factored in automatically.</div>
     <div class="zone-row">
       <div>
         <div class="field-lbl">Radius (meters)</div>
@@ -305,25 +276,22 @@ body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--text
       <div class="stat-sub" id="statTotalSub">all time</div>
     </div>
   </div>
-
 </div>
 </div>
 
-<!-- ══════════ REPORT PAGE ══════════ -->
 <div class="page" id="pageReport">
 <div class="container">
-  <div class="report-header">
-    <div class="report-title">Daily Report</div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
-      <button class="btn-export" onclick="exportText()">📄 Export Text</button>
-    </div>
-  </div>
-  <div class="report-nav" style="margin-bottom:16px;">
+  <div class="report-title">Daily Report</div>
+  <div class="report-controls">
     <button class="report-nav-btn" onclick="reportPrev()">◀ Prev</button>
     <div class="report-date-lbl" id="reportDateLbl">This Week</div>
     <button class="report-nav-btn" onclick="reportNext()">Next ▶</button>
     <button class="report-nav-btn" onclick="reportToday()">Today</button>
+  </div>
+  <div class="export-row">
+    <button class="btn-export pdf" onclick="exportPDF()">⬇ Download PDF Report</button>
+    <button class="btn-export" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn-export" onclick="exportText()">📄 TXT</button>
   </div>
   <div id="reportList"></div>
 </div>
@@ -333,337 +301,167 @@ body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--text
 
 <script>
 'use strict';
+const LS_SESSIONS='wt_sessions_v2',LS_ZONE='wt_zone',LS_TIMER='wt_timer_v2',ACC_CAP=50;
+let isRunning=false,isPaused=false,autoGeopaused=false;
+let startTimestamp=null,pausedElapsed=0,sessionStartTime=null,currentEvents=[];
+let workZone=JSON.parse(localStorage.getItem(LS_ZONE)||'null');
+let locationWatchId=null,insideZone=null,lastAccuracy=null;
+let sessions=JSON.parse(localStorage.getItem(LS_SESSIONS)||'[]');
+let reportWeekOffset=0,timerInterval=null;
 
-// ─── CONSTANTS ───────────────────────────────────────────────
-const LS_SESSIONS = 'wt_sessions_v2';
-const LS_ZONE = 'wt_zone';
-const LS_TIMER = 'wt_timer_v2';
-const ACC_CAP = 50; // max GPS accuracy bonus in metres
-
-// ─── STATE ───────────────────────────────────────────────────
-let isRunning = false, isPaused = false, autoGeopaused = false;
-let startTimestamp = null;   // when current running segment started
-let pausedElapsed = 0;       // ms before current segment
-let sessionStartTime = null; // Date of session start
-let currentEvents = [];      // [{type, time, note?}] for current session
-
-let workZone = JSON.parse(localStorage.getItem(LS_ZONE) || 'null');
-let locationWatchId = null;
-let insideZone = null;
-let lastAccuracy = null;
-
-let sessions = JSON.parse(localStorage.getItem(LS_SESSIONS) || '[]');
-
-// Report navigation: offset in weeks (0 = current week)
-let reportWeekOffset = 0;
-
-// ─── PAGES ───────────────────────────────────────────────────
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
-  document.getElementById('tab' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
-  if (name === 'report') renderReport();
+function showPage(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page'+n[0].toUpperCase()+n.slice(1)).classList.add('active');
+  document.getElementById('tab'+n[0].toUpperCase()+n.slice(1)).classList.add('active');
+  if(n==='report')renderReport();
 }
 
-// ─── PERSIST / RESTORE ───────────────────────────────────────
-function saveTimerState() {
-  if (!isRunning && !isPaused && !autoGeopaused) {
-    localStorage.removeItem(LS_TIMER); return;
-  }
-  localStorage.setItem(LS_TIMER, JSON.stringify({
-    startTimestamp, pausedElapsed, isRunning, isPaused, autoGeopaused,
-    sessionStartTime: sessionStartTime ? sessionStartTime.toISOString() : null,
-    currentEvents
-  }));
+function saveTimerState(){
+  if(!isRunning&&!isPaused&&!autoGeopaused){localStorage.removeItem(LS_TIMER);return;}
+  localStorage.setItem(LS_TIMER,JSON.stringify({startTimestamp,pausedElapsed,isRunning,isPaused,autoGeopaused,sessionStartTime:sessionStartTime?sessionStartTime.toISOString():null,currentEvents}));
 }
-
-function restoreTimerState() {
-  const raw = localStorage.getItem(LS_TIMER);
-  if (!raw) return false;
-  try {
-    const s = JSON.parse(raw);
-    pausedElapsed = s.pausedElapsed || 0;
-    sessionStartTime = s.sessionStartTime ? new Date(s.sessionStartTime) : null;
-    currentEvents = s.currentEvents || [];
-
-    if (s.isRunning && s.startTimestamp) {
-      // Was running when closed — add the gap as worked time
-      pausedElapsed += Date.now() - s.startTimestamp;
-      startTimestamp = Date.now();
-      isRunning = true;
-      timerInterval = setInterval(tick, 500);
-      setUI('running'); tick();
-      updateSessionInfo();
-      showToast('🔄 Timer restored after reload');
-      return true;
-    } else if (s.isPaused) {
-      isPaused = true;
-      document.getElementById('timerDisplay').textContent = msToHMS(pausedElapsed);
-      setUI('paused'); updateSessionInfo(); return true;
-    } else if (s.autoGeopaused) {
-      autoGeopaused = true;
-      document.getElementById('timerDisplay').textContent = msToHMS(pausedElapsed);
-      setUI('outside'); updateSessionInfo(); return true;
-    }
-  } catch(e) { localStorage.removeItem(LS_TIMER); }
+function restoreTimerState(){
+  const raw=localStorage.getItem(LS_TIMER);if(!raw)return false;
+  try{
+    const s=JSON.parse(raw);
+    pausedElapsed=s.pausedElapsed||0;sessionStartTime=s.sessionStartTime?new Date(s.sessionStartTime):null;currentEvents=s.currentEvents||[];
+    if(s.isRunning&&s.startTimestamp){pausedElapsed+=Date.now()-s.startTimestamp;startTimestamp=Date.now();isRunning=true;timerInterval=setInterval(tick,500);setUI('running');tick();updateSessionInfo();showToast('🔄 Timer restored');return true;}
+    else if(s.isPaused){isPaused=true;document.getElementById('timerDisplay').textContent=msToHMS(pausedElapsed);setUI('paused');updateSessionInfo();return true;}
+    else if(s.autoGeopaused){autoGeopaused=true;document.getElementById('timerDisplay').textContent=msToHMS(pausedElapsed);setUI('outside');updateSessionInfo();return true;}
+  }catch(e){localStorage.removeItem(LS_TIMER);}
   return false;
 }
 
-// ─── PERMISSION ──────────────────────────────────────────────
-function requestPermission() {
-  if (!navigator.geolocation) { showDenied('❌ Geolocation not supported.'); return; }
-  const btn = document.getElementById('permBtn');
-  btn.textContent = '📡 Requesting…'; btn.disabled = true;
+function requestPermission(){
+  if(!navigator.geolocation){showDenied('Geolocation not supported.');return;}
+  const btn=document.getElementById('permBtn');btn.textContent='📡 Requesting…';btn.disabled=true;
   navigator.geolocation.getCurrentPosition(
-    () => { closeOverlay(); showToast('📍 Location granted!'); if (workZone) startWatching(); },
-    err => {
-      btn.textContent = '📍 Allow Location'; btn.disabled = false;
-      showDenied(err.code===1 ? '⚠️ Denied. Enable location in browser/phone settings, then reload.' : '⚠️ GPS unavailable. Check location settings.');
-    },
-    { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
+    ()=>{closeOverlay();showToast('📍 Location granted!');if(workZone)startWatching();},
+    err=>{btn.textContent='📍 Allow Location';btn.disabled=false;showDenied(err.code===1?'⚠️ Denied. Enable location in browser/phone settings, then reload.':'⚠️ GPS unavailable.');},
+    {enableHighAccuracy:true,timeout:15000,maximumAge:0}
   );
 }
-function showDenied(msg) { const d=document.getElementById('permDenied'); d.textContent=msg; d.style.display='block'; }
-function skipPermission() { closeOverlay(); showToast('⚠️ Running without geofencing'); }
-function closeOverlay() {
-  const o=document.getElementById('permOverlay');
-  o.classList.add('hidden'); setTimeout(()=>o.style.display='none',320);
-}
+function showDenied(m){const d=document.getElementById('permDenied');d.textContent=m;d.style.display='block';}
+function skipPermission(){closeOverlay();showToast('⚠️ Running without geofencing');}
+function closeOverlay(){const o=document.getElementById('permOverlay');o.classList.add('hidden');setTimeout(()=>o.style.display='none',320);}
 
-// ─── DATE LABEL ──────────────────────────────────────────────
-function updateDateLabel() {
-  document.getElementById('timerDate').textContent =
-    new Date().toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'});
-}
-updateDateLabel(); setInterval(updateDateLabel,60000);
+function updateDateLabel(){document.getElementById('timerDate').textContent=new Date().toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'});}
+updateDateLabel();setInterval(updateDateLabel,60000);
 
-// ─── TIMER ───────────────────────────────────────────────────
-let timerInterval = null;
-
-function startTimer() {
-  if (!workZone) { showToast('⚠️ Set your work zone first'); document.querySelector('.zone-card').scrollIntoView({behavior:'smooth'}); return; }
-  if (insideZone === false) { showToast('⚠️ You are outside the work zone'); return; }
-
-  if (isPaused || autoGeopaused) {
-    // Resume from manual or geo break
-    const breakInTime = new Date();
-    const breakType = autoGeopaused ? 'geo' : 'manual';
-    currentEvents.push({ type:'break-in', time:breakInTime.toISOString(), note: breakType === 'geo' ? 'Auto (returned to zone)' : 'Manual resume' });
-    startTimestamp = Date.now();
-    isRunning = true; isPaused = false; autoGeopaused = false;
-    timerInterval = setInterval(tick, 500);
-    setUI('running'); saveTimerState(); showToast('▶ Break ended');
-    updateSessionInfo();
-  } else {
-    // Fresh clock-in
-    startTimestamp = Date.now(); pausedElapsed = 0;
-    sessionStartTime = new Date(); currentEvents = [];
-    currentEvents.push({ type:'punch-in', time:sessionStartTime.toISOString(), note:'' });
-    isRunning = true;
-    timerInterval = setInterval(tick, 500);
-    setUI('running'); saveTimerState();
-    updateSessionInfo(); showToast('✅ Clocked in'); requestWakeLock();
+function startTimer(){
+  if(!workZone){showToast('⚠️ Set your work zone first');document.querySelector('.zone-card').scrollIntoView({behavior:'smooth'});return;}
+  if(insideZone===false){showToast('⚠️ You are outside the work zone');return;}
+  if(isPaused||autoGeopaused){
+    currentEvents.push({type:'break-in',time:new Date().toISOString(),note:autoGeopaused?'Auto (returned to zone)':'Manual resume'});
+    startTimestamp=Date.now();isRunning=true;isPaused=false;autoGeopaused=false;
+    timerInterval=setInterval(tick,500);setUI('running');saveTimerState();showToast('▶ Break ended');updateSessionInfo();
+  }else{
+    startTimestamp=Date.now();pausedElapsed=0;sessionStartTime=new Date();currentEvents=[];
+    currentEvents.push({type:'punch-in',time:sessionStartTime.toISOString(),note:''});
+    isRunning=true;timerInterval=setInterval(tick,500);setUI('running');saveTimerState();
+    updateSessionInfo();showToast('✅ Clocked in');requestWakeLock();
   }
 }
-
-function manualBreak() {
-  if (!isRunning) return;
-  const breakTime = new Date();
-  currentEvents.push({ type:'break-out', time:breakTime.toISOString(), note:'Manual break' });
-  doPause(false); saveTimerState(); showToast('⏸ Break started');
+function manualBreak(){
+  if(!isRunning)return;
+  currentEvents.push({type:'break-out',time:new Date().toISOString(),note:'Manual break'});
+  doPause(false);saveTimerState();showToast('⏸ Break started');
 }
-
-function doPause(byGeo) {
-  clearInterval(timerInterval);
-  pausedElapsed += Date.now() - startTimestamp;
-  isRunning = false;
-  if (byGeo) {
-    autoGeopaused = true; isPaused = false;
-    currentEvents.push({ type:'geo-out', time:new Date().toISOString(), note:'Left work zone' });
-    setUI('outside');
-  } else {
-    isPaused = true; autoGeopaused = false;
-    setUI('paused');
-  }
+function doPause(byGeo){
+  clearInterval(timerInterval);pausedElapsed+=Date.now()-startTimestamp;isRunning=false;
+  if(byGeo){autoGeopaused=true;isPaused=false;currentEvents.push({type:'geo-out',time:new Date().toISOString(),note:'Left work zone'});setUI('outside');}
+  else{isPaused=true;autoGeopaused=false;setUI('paused');}
   saveTimerState();
 }
-
-function stopTimer() {
-  if (!isRunning && !isPaused && !autoGeopaused) return;
+function stopTimer(){
+  if(!isRunning&&!isPaused&&!autoGeopaused)return;
   clearInterval(timerInterval);
-  const totalMs = pausedElapsed + (isRunning ? Date.now() - startTimestamp : 0);
-  const endTime = new Date();
-  currentEvents.push({ type:'punch-out', time:endTime.toISOString(), note:'' });
-
-  sessions.unshift({
-    id: Date.now(),
-    start: sessionStartTime.toISOString(),
-    end: endTime.toISOString(),
-    duration: totalMs,
-    events: [...currentEvents],
-    zone: workZone ? { lat:workZone.lat, lng:workZone.lng, radius:workZone.radius } : null
-  });
-  saveSessions(); updateStats();
-
-  isRunning = false; isPaused = false; autoGeopaused = false;
-  pausedElapsed = 0; startTimestamp = null; sessionStartTime = null; currentEvents = [];
+  const totalMs=pausedElapsed+(isRunning?Date.now()-startTimestamp:0);
+  const endTime=new Date();
+  currentEvents.push({type:'punch-out',time:endTime.toISOString(),note:''});
+  sessions.unshift({id:Date.now(),start:sessionStartTime.toISOString(),end:endTime.toISOString(),duration:totalMs,events:[...currentEvents],zone:workZone?{lat:workZone.lat,lng:workZone.lng,radius:workZone.radius}:null});
+  saveSessions();updateStats();
+  isRunning=false;isPaused=false;autoGeopaused=false;pausedElapsed=0;startTimestamp=null;sessionStartTime=null;currentEvents=[];
   localStorage.removeItem(LS_TIMER);
-  document.getElementById('timerDisplay').textContent = '00:00:00';
-  document.getElementById('timerDisplay').className = 'timer-display';
-  document.getElementById('timerSessionInfo').textContent = '—';
-  setUI('idle'); showToast('✅ Clocked out — ' + fmtDuration(totalMs));
+  document.getElementById('timerDisplay').textContent='00:00:00';
+  document.getElementById('timerDisplay').className='timer-display';
+  document.getElementById('timerSessionInfo').textContent='—';
+  setUI('idle');showToast('✅ Clocked out — '+fmtDuration(totalMs));
+}
+function tick(){
+  const el=pausedElapsed+(isRunning?Date.now()-startTimestamp:0);
+  document.getElementById('timerDisplay').textContent=msToHMS(el);
+  if(Math.floor(el/30000)!==Math.floor((el-500)/30000))saveTimerState();
+}
+function updateSessionInfo(){
+  if(!sessionStartTime)return;
+  const breaks=currentEvents.filter(e=>e.type==='break-out'||e.type==='geo-out').length;
+  document.getElementById('timerSessionInfo').textContent='Since '+sessionStartTime.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+(breaks?'  ·  '+breaks+' break'+(breaks>1?'s':''):'');
 }
 
-function tick() {
-  const el = pausedElapsed + (isRunning ? Date.now() - startTimestamp : 0);
-  document.getElementById('timerDisplay').textContent = msToHMS(el);
-  if (Math.floor(el/30000) !== Math.floor((el-500)/30000)) saveTimerState();
+function setUI(state){
+  const card=document.getElementById('timerCard'),dot=document.getElementById('statusDot'),lbl=document.getElementById('statusLabel'),disp=document.getElementById('timerDisplay'),btnStart=document.getElementById('btnStart'),btnPause=document.getElementById('btnPause'),btnStop=document.getElementById('btnStop'),alert=document.getElementById('geoAlert');
+  card.className='timer-card';disp.className='timer-display';dot.className='status-dot';alert.classList.remove('visible');
+  if(state==='running'){card.classList.add('running');disp.classList.add('running');dot.classList.add('running');lbl.textContent='RUNNING';lbl.className='status-label running';btnStart.disabled=true;btnPause.disabled=false;btnStop.disabled=false;btnStart.textContent='▶ Clock In';document.getElementById('statusRight').innerHTML=sessionStartTime?'In since <span>'+sessionStartTime.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</span>':'';}
+  else if(state==='paused'){disp.classList.add('paused');dot.classList.add('paused');lbl.textContent='ON BREAK';lbl.className='status-label paused';btnStart.disabled=false;btnPause.disabled=true;btnStop.disabled=false;btnStart.textContent='▶ Resume';document.getElementById('statusRight').innerHTML='Break in progress';}
+  else if(state==='outside'){card.classList.add('outside');disp.classList.add('outside');dot.classList.add('outside');lbl.textContent='LEFT ZONE';lbl.className='status-label outside';alert.classList.add('visible');btnStart.disabled=true;btnPause.disabled=true;btnStop.disabled=false;btnStart.textContent='▶ Resume';document.getElementById('statusRight').innerHTML='Auto-paused';}
+  else{dot.classList.add('idle');lbl.textContent='IDLE';lbl.className='status-label';btnStart.disabled=false;btnPause.disabled=true;btnStop.disabled=true;btnStart.textContent='▶ Clock In';document.getElementById('statusRight').textContent='No active session';}
 }
 
-function updateSessionInfo() {
-  if (!sessionStartTime) return;
-  const breaks = currentEvents.filter(e => e.type==='break-out'||e.type==='geo-out').length;
-  document.getElementById('timerSessionInfo').textContent =
-    'Since ' + sessionStartTime.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) +
-    (breaks ? '  ·  ' + breaks + ' break' + (breaks>1?'s':'') : '');
+function setWorkZone(){
+  if(!navigator.geolocation){showToast('Not supported');return;}
+  const btn=document.getElementById('btnSetZone');btn.disabled=true;btn.textContent='📡 Getting GPS…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const radius=Math.max(20,parseInt(document.getElementById('radiusInput').value)||100);
+    workZone={lat:pos.coords.latitude,lng:pos.coords.longitude,radius};localStorage.setItem(LS_ZONE,JSON.stringify(workZone));
+    btn.disabled=false;btn.textContent='📌 Update Zone';updateZoneInfo(pos.coords.accuracy);showToast('✅ Work zone set ('+radius+'m)');startWatching();
+  },err=>{btn.disabled=false;btn.textContent='📌 Set Zone';if(err.code===1){showToast('❌ Location denied');document.getElementById('permOverlay').style.display='flex';document.getElementById('permOverlay').classList.remove('hidden');}else showToast('❌ GPS error — try again');},{enableHighAccuracy:true,timeout:12000,maximumAge:0});
 }
-
-// ─── UI ──────────────────────────────────────────────────────
-function setUI(state) {
-  const card=document.getElementById('timerCard'), dot=document.getElementById('statusDot'),
-    lbl=document.getElementById('statusLabel'), disp=document.getElementById('timerDisplay'),
-    btnStart=document.getElementById('btnStart'), btnPause=document.getElementById('btnPause'),
-    btnStop=document.getElementById('btnStop'), alert=document.getElementById('geoAlert');
-  card.className='timer-card'; disp.className='timer-display';
-  dot.className='status-dot'; alert.classList.remove('visible');
-  if (state==='running') {
-    card.classList.add('running'); disp.classList.add('running'); dot.classList.add('running');
-    lbl.textContent='RUNNING'; lbl.className='status-label running';
-    btnStart.disabled=true; btnPause.disabled=false; btnStop.disabled=false;
-    btnStart.textContent='▶ Clock In';
-    document.getElementById('statusRight').innerHTML = sessionStartTime
-      ? 'In since <span>'+sessionStartTime.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</span>' : '';
-  } else if (state==='paused') {
-    disp.classList.add('paused'); dot.classList.add('paused');
-    lbl.textContent='ON BREAK'; lbl.className='status-label paused';
-    btnStart.disabled=false; btnPause.disabled=true; btnStop.disabled=false; btnStart.textContent='▶ Resume';
-    document.getElementById('statusRight').innerHTML = 'Break in progress';
-  } else if (state==='outside') {
-    card.classList.add('outside'); disp.classList.add('outside'); dot.classList.add('outside');
-    lbl.textContent='LEFT ZONE'; lbl.className='status-label outside'; alert.classList.add('visible');
-    btnStart.disabled=true; btnPause.disabled=true; btnStop.disabled=false; btnStart.textContent='▶ Resume';
-    document.getElementById('statusRight').innerHTML = 'Auto-paused';
-  } else {
-    dot.classList.add('idle'); lbl.textContent='IDLE'; lbl.className='status-label';
-    btnStart.disabled=false; btnPause.disabled=true; btnStop.disabled=true; btnStart.textContent='▶ Clock In';
-    document.getElementById('statusRight').textContent = 'No active session';
-  }
+function updateZoneInfo(accuracy){
+  if(!workZone)return;
+  const acc=accuracy?Math.round(accuracy):null,isWarn=acc&&acc>workZone.radius*0.5;
+  const el=document.getElementById('zoneInfo');el.style.display='block';el.className='zone-info'+(isWarn?' warn':'');
+  el.innerHTML=`✓ <strong>${workZone.lat.toFixed(5)}, ${workZone.lng.toFixed(5)}</strong> · Radius: ${workZone.radius}m`+(acc?`<br>${isWarn?'⚠️ GPS accuracy ±'+acc+'m — effective radius expanded to '+(workZone.radius+Math.min(acc,ACC_CAP))+'m':'✓ GPS accuracy ±'+acc+'m'}` :'');
 }
-
-// ─── GEOFENCE ────────────────────────────────────────────────
-function setWorkZone() {
-  if (!navigator.geolocation) { showToast('Not supported'); return; }
-  const btn=document.getElementById('btnSetZone');
-  btn.disabled=true; btn.textContent='📡 Getting GPS…';
-  navigator.geolocation.getCurrentPosition(pos => {
-    const radius = Math.max(20, parseInt(document.getElementById('radiusInput').value)||100);
-    workZone = { lat:pos.coords.latitude, lng:pos.coords.longitude, radius };
-    localStorage.setItem(LS_ZONE, JSON.stringify(workZone));
-    btn.disabled=false; btn.textContent='📌 Update Zone';
-    updateZoneInfo(pos.coords.accuracy);
-    showToast('✅ Work zone set ('+radius+'m)'); startWatching();
-  }, err => {
-    btn.disabled=false; btn.textContent='📌 Set Zone';
-    if (err.code===1) { showToast('❌ Location denied'); document.getElementById('permOverlay').style.display='flex'; document.getElementById('permOverlay').classList.remove('hidden'); }
-    else showToast('❌ GPS error — try again');
-  }, { enableHighAccuracy:true, timeout:12000, maximumAge:0 });
+function startWatching(){
+  if(locationWatchId!==null)navigator.geolocation.clearWatch(locationWatchId);
+  if(!navigator.geolocation)return;
+  locationWatchId=navigator.geolocation.watchPosition(pos=>{lastAccuracy=pos.coords.accuracy;updateAccTag(pos.coords.accuracy);if(workZone)checkFence({lat:pos.coords.latitude,lng:pos.coords.longitude},pos.coords.accuracy);},()=>{},{enableHighAccuracy:true,maximumAge:5000,timeout:20000});
 }
-
-function updateZoneInfo(accuracy) {
-  if (!workZone) return;
-  const acc = accuracy ? Math.round(accuracy) : null;
-  const isWarn = acc && acc > workZone.radius * 0.5;
-  const el = document.getElementById('zoneInfo');
-  el.style.display = 'block';
-  el.className = 'zone-info' + (isWarn ? ' warn' : '');
-  el.innerHTML = `✓ <strong>${workZone.lat.toFixed(5)}, ${workZone.lng.toFixed(5)}</strong> · Radius: ${workZone.radius}m` +
-    (acc ? `<br>${isWarn ? '⚠️ GPS accuracy ±'+acc+'m — effective radius expanded to '+(workZone.radius+Math.min(acc,ACC_CAP))+'m' : '✓ GPS accuracy ±'+acc+'m'}` : '');
+function checkFence(pos,accuracy){
+  if(!workZone)return;
+  const dist=haversine(pos.lat,pos.lng,workZone.lat,workZone.lng),accBonus=accuracy?Math.min(Math.ceil(accuracy),ACC_CAP):0,effectiveR=workZone.radius+accBonus,nowIn=dist<=effectiveR;
+  updateGeoLine(nowIn,dist,effectiveR);if(workZone)updateZoneInfo(accuracy);
+  if(nowIn===insideZone)return;
+  const prev=insideZone;insideZone=nowIn;
+  if(!nowIn&&isRunning){doPause(true);showToast('🚨 Left zone — timer paused');vibrate([200,100,200]);}
+  if(nowIn&&autoGeopaused){currentEvents.push({type:'geo-in',time:new Date().toISOString(),note:'Returned to zone'});startTimestamp=Date.now();isRunning=true;autoGeopaused=false;timerInterval=setInterval(tick,500);setUI('running');saveTimerState();updateSessionInfo();document.getElementById('geoAlert').classList.remove('visible');showToast('✅ Back in zone — resumed');vibrate([100]);}
+  if(nowIn&&prev===null&&!isRunning&&!isPaused&&!autoGeopaused)showToast('📍 Inside work zone — ready to clock in');
 }
-
-function startWatching() {
-  if (locationWatchId !== null) navigator.geolocation.clearWatch(locationWatchId);
-  if (!navigator.geolocation) return;
-  locationWatchId = navigator.geolocation.watchPosition(
-    pos => {
-      lastAccuracy = pos.coords.accuracy;
-      updateAccTag(pos.coords.accuracy);
-      if (workZone) checkFence({ lat:pos.coords.latitude, lng:pos.coords.longitude }, pos.coords.accuracy);
-    },
-    ()=>{}, { enableHighAccuracy:true, maximumAge:5000, timeout:20000 }
-  );
+function updateGeoLine(inside,dist,effectiveR){
+  const dot=document.getElementById('geoDot'),text=document.getElementById('geoText'),dStr=dist<1000?Math.round(dist)+'m':(dist/1000).toFixed(2)+'km';
+  if(inside){dot.className='geo-dot-sm inside';text.style.color='var(--green)';text.textContent='✓ In zone · '+dStr+' from center';}
+  else{dot.className='geo-dot-sm outside';text.style.color='var(--red)';text.textContent='✗ Outside · '+dStr+' away (limit: '+effectiveR+'m)';}
 }
-
-function checkFence(pos, accuracy) {
-  if (!workZone) return;
-  const dist = haversine(pos.lat, pos.lng, workZone.lat, workZone.lng);
-  const accBonus = accuracy ? Math.min(Math.ceil(accuracy), ACC_CAP) : 0;
-  const effectiveR = workZone.radius + accBonus;
-  const nowIn = dist <= effectiveR;
-  updateGeoLine(nowIn, dist, effectiveR);
-  if (workZone) updateZoneInfo(accuracy);
-  if (nowIn === insideZone) return;
-  const prev = insideZone; insideZone = nowIn;
-  if (!nowIn && isRunning) { doPause(true); showToast('🚨 Left zone — timer paused'); vibrate([200,100,200]); }
-  if (nowIn && autoGeopaused) {
-    currentEvents.push({ type:'geo-in', time:new Date().toISOString(), note:'Returned to zone' });
-    startTimestamp = Date.now(); isRunning = true; autoGeopaused = false;
-    timerInterval = setInterval(tick,500); setUI('running'); saveTimerState(); updateSessionInfo();
-    document.getElementById('geoAlert').classList.remove('visible');
-    showToast('✅ Back in zone — resumed'); vibrate([100]);
-  }
-  if (nowIn && prev===null && !isRunning && !isPaused && !autoGeopaused)
-    showToast('📍 Inside work zone — ready to clock in');
-}
-
-function updateGeoLine(inside, dist, effectiveR) {
-  const dot=document.getElementById('geoDot'), text=document.getElementById('geoText');
-  const dStr = dist<1000 ? Math.round(dist)+'m' : (dist/1000).toFixed(2)+'km';
-  if (inside) { dot.className='geo-dot-sm inside'; text.style.color='var(--green)'; text.textContent='✓ In zone · '+dStr+' from center'; }
-  else { dot.className='geo-dot-sm outside'; text.style.color='var(--red)'; text.textContent='✗ Outside · '+dStr+' away (limit: '+effectiveR+'m)'; }
-}
-function updateAccTag(accuracy) {
-  const t=document.getElementById('accTag');
-  if(!accuracy){t.style.display='none';return;}
-  const a=Math.round(accuracy);
-  t.style.display='inline'; t.textContent='GPS ±'+a+'m';
-  t.className='acc-tag'+(a>30?' warn':'');
+function updateAccTag(accuracy){
+  const t=document.getElementById('accTag');if(!accuracy){t.style.display='none';return;}
+  const a=Math.round(accuracy);t.style.display='inline';t.textContent='GPS ±'+a+'m';t.className='acc-tag'+(a>30?' warn':'');
 }
 function haversine(lat1,lng1,lat2,lng2){const R=6371000,dL=(lat2-lat1)*Math.PI/180,dN=(lng2-lng1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 function vibrate(p){try{navigator.vibrate?.(p);}catch(e){}}
 
-// ─── WAKE LOCK ───────────────────────────────────────────────
 let wakeLock=null;
 async function requestWakeLock(){try{if('wakeLock' in navigator)wakeLock=await navigator.wakeLock.request('screen');}catch(e){}}
-document.addEventListener('visibilitychange',async()=>{
-  if(document.visibilityState==='visible'){if(isRunning)tick();saveTimerState();}
-  try{if(wakeLock&&document.visibilityState==='visible'&&isRunning)wakeLock=await navigator.wakeLock.request('screen');}catch(e){}
-});
-window.addEventListener('pagehide',saveTimerState);
-window.addEventListener('beforeunload',saveTimerState);
+document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'){if(isRunning)tick();saveTimerState();}try{if(wakeLock&&document.visibilityState==='visible'&&isRunning)wakeLock=await navigator.wakeLock.request('screen');}catch(e){}});
+window.addEventListener('pagehide',saveTimerState);window.addEventListener('beforeunload',saveTimerState);
 
-// ─── SESSIONS & STATS ────────────────────────────────────────
 function saveSessions(){localStorage.setItem(LS_SESSIONS,JSON.stringify(sessions));}
-
-function updateStats() {
-  const now=new Date(), todayStr=now.toDateString();
-  const wk=new Date(now); wk.setDate(now.getDate()-now.getDay()+(now.getDay()===0?-6:1)); wk.setHours(0,0,0,0);
+function updateStats(){
+  const now=new Date(),todayStr=now.toDateString(),wk=new Date(now);
+  wk.setDate(now.getDate()-now.getDay()+(now.getDay()===0?-6:1));wk.setHours(0,0,0,0);
   let todayMs=0,weekMs=0,totalMs=0,todayN=0;
-  sessions.forEach(s=>{
-    const d=new Date(s.start); totalMs+=s.duration;
-    if(d.toDateString()===todayStr){todayMs+=s.duration;todayN++;}
-    if(d>=wk)weekMs+=s.duration;
-  });
+  sessions.forEach(s=>{const d=new Date(s.start);totalMs+=s.duration;if(d.toDateString()===todayStr){todayMs+=s.duration;todayN++;}if(d>=wk)weekMs+=s.duration;});
   document.getElementById('statToday').textContent=fmtDuration(todayMs)||'0m 00s';
   document.getElementById('statTodaySub').textContent=todayN+' session'+(todayN!==1?'s':'');
   document.getElementById('statWeek').textContent=fmtDuration(weekMs)||'0m 00s';
@@ -671,293 +469,259 @@ function updateStats() {
   document.getElementById('statTotalSub').textContent=sessions.length+' total';
 }
 
-// ─── REPORT ──────────────────────────────────────────────────
-function getWeekRange(offset) {
-  const now = new Date();
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - now.getDay() + (now.getDay()===0?-6:1) + offset*7);
-  monday.setHours(0,0,0,0);
-  const sunday = new Date(monday); sunday.setDate(monday.getDate()+6); sunday.setHours(23,59,59,999);
-  return { start:monday, end:sunday };
+function getWeekRange(offset){
+  const now=new Date(),monday=new Date(now);
+  monday.setDate(now.getDate()-now.getDay()+(now.getDay()===0?-6:1)+offset*7);monday.setHours(0,0,0,0);
+  const sunday=new Date(monday);sunday.setDate(monday.getDate()+6);sunday.setHours(23,59,59,999);
+  return{start:monday,end:sunday};
 }
-
-function reportPrev() { reportWeekOffset--; renderReport(); }
-function reportNext() { if(reportWeekOffset<0){reportWeekOffset++;renderReport();} }
-function reportToday() { reportWeekOffset=0; renderReport(); }
-
-function renderReport() {
-  const { start, end } = getWeekRange(reportWeekOffset);
-  const lbl = reportWeekOffset===0 ? 'This Week' :
-    reportWeekOffset===-1 ? 'Last Week' :
-    start.toLocaleDateString([],{month:'short',day:'numeric'}) + ' – ' + end.toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
-  document.getElementById('reportDateLbl').textContent = lbl;
-  document.getElementById('reportList').innerHTML = buildReportHTML(start, end);
+function reportPrev(){reportWeekOffset--;renderReport();}
+function reportNext(){if(reportWeekOffset<0){reportWeekOffset++;renderReport();}}
+function reportToday(){reportWeekOffset=0;renderReport();}
+function renderReport(){
+  const{start,end}=getWeekRange(reportWeekOffset);
+  document.getElementById('reportDateLbl').textContent=reportWeekOffset===0?'This Week':reportWeekOffset===-1?'Last Week':start.toLocaleDateString([],{month:'short',day:'numeric'})+' – '+end.toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('reportList').innerHTML=buildReportHTML(start,end);
 }
-
-function buildReportHTML(weekStart, weekEnd) {
-  // Group sessions by day
-  const inRange = sessions.filter(s => {
-    const d = new Date(s.start); return d >= weekStart && d <= weekEnd;
-  });
-  if (!inRange.length) return `<div class="empty"><div class="empty-icon">📋</div>No sessions in this period.<br>Clock in to start tracking.</div>`;
-
-  // Group by date string
-  const byDay = {};
-  inRange.forEach(s => {
-    const key = new Date(s.start).toDateString();
-    if (!byDay[key]) byDay[key] = [];
-    byDay[key].push(s);
-  });
-
-  return Object.entries(byDay).map(([dateStr, daySessions], idx) => {
-    const dayDate = new Date(dateStr);
-    const dayTotalMs = daySessions.reduce((a,s)=>a+s.duration, 0);
-    const dayBreakMs = daySessions.reduce((a,s)=>a+calcBreakMs(s),0);
-    const dayWorkMs = dayTotalMs - dayBreakMs;
-    const sessionsHtml = daySessions.map((s,si)=>buildSessionBlock(s,si+1,daySessions.length)).join('');
-
-    return `<div class="day-card${idx===0?' open':''}" id="daycard-${dateStr.replace(/\s/g,'_')}">
-      <div class="day-card-head" onclick="toggleDay(this.parentElement)">
-        <div class="day-date-block">
-          <div class="day-weekday">${dayDate.toLocaleDateString([],{weekday:'long'})}</div>
-          <div class="day-fulldate">${dayDate.toLocaleDateString([],{day:'2-digit',month:'long',year:'numeric'})}</div>
-        </div>
-        <div class="day-summary">
-          <div>
-            <div class="day-total">${fmtDuration(dayWorkMs)}</div>
-            <div class="day-meta">${daySessions.length} session${daySessions.length!==1?'s':''}</div>
-          </div>
-          <span class="day-toggle">▼</span>
-        </div>
+function buildReportHTML(weekStart,weekEnd){
+  const inRange=sessions.filter(s=>{const d=new Date(s.start);return d>=weekStart&&d<=weekEnd;});
+  if(!inRange.length)return`<div class="empty"><div class="empty-icon">📋</div>No sessions in this period.<br>Clock in to start tracking.</div>`;
+  const byDay={};inRange.forEach(s=>{const k=new Date(s.start).toDateString();if(!byDay[k])byDay[k]=[];byDay[k].push(s);});
+  return Object.entries(byDay).map(([dateStr,daySessions],idx)=>{
+    const dayDate=new Date(dateStr),dayTotalMs=daySessions.reduce((a,s)=>a+s.duration,0),dayBreakMs=daySessions.reduce((a,s)=>a+calcBreakMs(s),0),dayWorkMs=dayTotalMs-dayBreakMs;
+    return`<div class="day-card${idx===0?' open':''}">
+      <div class="day-card-head" onclick="this.parentElement.classList.toggle('open')">
+        <div><div class="day-weekday">${dayDate.toLocaleDateString([],{weekday:'long'})}</div><div class="day-fulldate">${dayDate.toLocaleDateString([],{day:'2-digit',month:'long',year:'numeric'})}</div></div>
+        <div class="day-summary"><div><div class="day-total-big">${fmtDuration(dayWorkMs)}</div><div class="day-meta">${daySessions.length} session${daySessions.length!==1?'s':''}</div></div><span class="day-toggle">▼</span></div>
       </div>
       <div class="day-body">
-        ${sessionsHtml}
+        ${daySessions.map((s,si)=>buildSessionBlock(s,si+1,daySessions.length)).join('')}
         <div class="day-totals-bar">
-          <div class="day-total-cell">
-            <div class="day-total-cell-lbl">Work Time</div>
-            <div class="day-total-cell-val green">${fmtDuration(dayWorkMs)}</div>
-          </div>
-          <div class="day-total-cell">
-            <div class="day-total-cell-lbl">Break Time</div>
-            <div class="day-total-cell-val amber">${fmtDuration(dayBreakMs)||'—'}</div>
-          </div>
-          <div class="day-total-cell">
-            <div class="day-total-cell-lbl">Total Time</div>
-            <div class="day-total-cell-val">${fmtDuration(dayTotalMs)}</div>
-          </div>
+          <div class="day-total-cell"><div class="day-total-cell-lbl">Work Time</div><div class="day-total-cell-val green">${fmtDuration(dayWorkMs)}</div></div>
+          <div class="day-total-cell"><div class="day-total-cell-lbl">Break Time</div><div class="day-total-cell-val amber">${fmtDuration(dayBreakMs)||'—'}</div></div>
+          <div class="day-total-cell"><div class="day-total-cell-lbl">Total</div><div class="day-total-cell-val">${fmtDuration(dayTotalMs)}</div></div>
         </div>
       </div>
     </div>`;
   }).join('');
 }
-
-function buildSessionBlock(s, num, total) {
-  const events = s.events || [
-    { type:'punch-in', time:s.start },
-    { type:'punch-out', time:s.end }
-  ];
-  const breakMs = calcBreakMs(s);
-  const workMs = s.duration - breakMs;
-  const numBreaks = events.filter(e=>e.type==='break-out'||e.type==='geo-out').length;
-
-  const tlHtml = buildTimeline(events);
-  const breakChips = buildBreakChips(events);
-
-  return `<div class="session-block">
-    <div class="session-block-head">
-      <span class="session-num">Session ${num}${total>1?' of '+total:''}</span>
-      <div style="text-align:right">
-        <div class="session-net-label">Work time</div>
-        <div class="session-net">${fmtDuration(workMs)}</div>
-      </div>
-    </div>
-    <div class="timeline">${tlHtml}</div>
-    ${breakChips ? '<div class="break-strip">'+breakChips+'</div>' : ''}
-  </div>`;
+function buildSessionBlock(s,num,total){
+  const events=s.events||[{type:'punch-in',time:s.start},{type:'punch-out',time:s.end}],breakMs=calcBreakMs(s),workMs=s.duration-breakMs;
+  return`<div class="session-block"><div class="session-block-head"><span class="session-num">Session ${num}${total>1?' of '+total:''}</span><div style="text-align:right"><div class="session-net-label">Work time</div><div class="session-net">${fmtDuration(workMs)}</div></div></div><div class="timeline">${buildTimeline(events)}</div>${buildBreakChips(events)?'<div class="break-strip">'+buildBreakChips(events)+'</div>':''}</div>`;
 }
-
-function buildTimeline(events) {
-  let html = '';
-  let lastBreakOutTime = null;
-
-  for (let i=0;i<events.length;i++) {
-    const ev = events[i];
-    const t = new Date(ev.time);
-    const timeStr = t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-
-    let dotClass='', label='', durHtml='';
-
-    if (ev.type==='punch-in') {
-      dotClass='punch-in'; label='Punch In';
-    } else if (ev.type==='punch-out') {
-      dotClass='punch-out'; label='Punch Out';
-      // Duration of last work segment
-      const prevIn = findPrevIn(events, i);
-      if (prevIn) { const dur=t-new Date(prevIn.time); durHtml=`<div class="tl-duration">+${fmtDuration(dur)} work</div>`; }
-    } else if (ev.type==='break-out'||ev.type==='geo-out') {
-      dotClass = ev.type==='geo-out' ? 'geo-out' : 'break-out';
-      label = ev.type==='geo-out' ? 'Left Zone (auto break)' : 'Break Out';
-      lastBreakOutTime = t;
-      // Duration of work segment since last break-in or punch-in
-      const prevIn = findPrevIn(events, i);
-      if (prevIn) { const dur=t-new Date(prevIn.time); durHtml=`<div class="tl-duration">+${fmtDuration(dur)} work</div>`; }
-    } else if (ev.type==='break-in'||ev.type==='geo-in') {
-      dotClass = ev.type==='geo-in' ? 'geo-in' : 'break-in';
-      label = ev.type==='geo-in' ? 'Returned (auto resume)' : 'Break In';
-      if (lastBreakOutTime) {
-        const breakDur = t - lastBreakOutTime;
-        durHtml = `<div class="tl-duration break-dur">Break: ${fmtDuration(breakDur)}</div>`;
-        lastBreakOutTime = null;
-      }
-    }
-
-    html += `<div class="tl-event">
-      <div class="tl-dot ${dotClass}"></div>
-      <div class="tl-content">
-        <div class="tl-time">${timeStr}</div>
-        <div class="tl-label">${label}${ev.note?' · <span style="color:var(--text3)">'+ev.note+'</span>':''}</div>
-        ${durHtml}
-      </div>
-    </div>`;
-  }
+function buildTimeline(events){
+  let html='',lastBreakOut=null;
+  events.forEach((ev,i)=>{
+    const t=new Date(ev.time),ts=t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    let dotClass='',label='',durHtml='';
+    if(ev.type==='punch-in'){dotClass='punch-in';label='Punch In';}
+    else if(ev.type==='punch-out'){dotClass='punch-out';label='Punch Out';const pIn=findPrevIn(events,i);if(pIn){const dur=t-new Date(pIn.time);durHtml=`<div class="tl-duration">+${fmtDuration(dur)} work</div>`;}}
+    else if(ev.type==='break-out'||ev.type==='geo-out'){dotClass=ev.type==='geo-out'?'geo-out':'break-out';label=ev.type==='geo-out'?'Left Zone (auto break)':'Break Out';lastBreakOut=t;const pIn=findPrevIn(events,i);if(pIn){const dur=t-new Date(pIn.time);durHtml=`<div class="tl-duration">+${fmtDuration(dur)} work</div>`;}}
+    else if(ev.type==='break-in'||ev.type==='geo-in'){dotClass=ev.type==='geo-in'?'geo-in':'break-in';label=ev.type==='geo-in'?'Returned (auto resume)':'Break In';if(lastBreakOut){durHtml=`<div class="tl-duration break-dur">Break: ${fmtDuration(t-lastBreakOut)}</div>`;lastBreakOut=null;}}
+    html+=`<div class="tl-event"><div class="tl-dot ${dotClass}"></div><div class="tl-content"><div class="tl-time">${ts}</div><div class="tl-label">${label}${ev.note?' · '+ev.note:''}</div>${durHtml}</div></div>`;
+  });
   return html;
 }
+function findPrevIn(events,idx){for(let i=idx-1;i>=0;i--){if(['punch-in','break-in','geo-in'].includes(events[i].type))return events[i];}return null;}
+function buildBreakChips(events){const chips=[];let lastOut=null;events.forEach(ev=>{if(ev.type==='break-out'||ev.type==='geo-out')lastOut=new Date(ev.time);else if((ev.type==='break-in'||ev.type==='geo-in')&&lastOut){chips.push(`<div class="break-chip">${ev.type==='geo-in'?'🗺 Auto':'☕ Break'}<span>${fmtDuration(new Date(ev.time)-lastOut)}</span></div>`);lastOut=null;}});return chips.join('');}
+function calcBreakMs(s){if(!s.events)return 0;let ms=0,lastOut=null;s.events.forEach(ev=>{if(ev.type==='break-out'||ev.type==='geo-out')lastOut=new Date(ev.time);else if((ev.type==='break-in'||ev.type==='geo-in')&&lastOut){ms+=new Date(ev.time)-lastOut;lastOut=null;}});return ms;}
 
-function findPrevIn(events, idx) {
-  for (let i=idx-1;i>=0;i--) {
-    if (events[i].type==='punch-in'||events[i].type==='break-in'||events[i].type==='geo-in') return events[i];
-  }
-  return null;
-}
+// ── PDF EXPORT ──────────────────────────────────────────────────
+function exportPDF(){
+  const{start,end}=getWeekRange(reportWeekOffset);
+  const inRange=sessions.filter(s=>{const d=new Date(s.start);return d>=start&&d<=end;});
+  if(!inRange.length){showToast('No sessions to export');return;}
 
-function buildBreakChips(events) {
-  const chips = [];
-  let lastOut = null;
-  events.forEach(ev => {
-    if (ev.type==='break-out'||ev.type==='geo-out') lastOut = new Date(ev.time);
-    else if ((ev.type==='break-in'||ev.type==='geo-in') && lastOut) {
-      const dur = new Date(ev.time) - lastOut;
-      chips.push(`<div class="break-chip">${ev.type==='geo-in'?'🗺 Auto':'☕ Break'}<span>${fmtDuration(dur)}</span></div>`);
-      lastOut = null;
-    }
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const PW=210,PH=297,ML=16,MR=16,CW=PW-ML-MR;
+  let y=0;
+
+  // Colours
+  const ink=[26,23,20],ink2=[90,85,80],ink3=[154,149,144];
+  const accentC=[200,82,26],accentDim=[253,232,220];
+  const greenC=[26,122,64],greenDim=[224,244,234];
+  const amberC=[168,96,16],amberDim=[254,243,220];
+  const redC=[192,32,32];
+  const blueC=[26,96,168];
+  const bgC=[247,244,240],surfC=[255,255,255],surf2C=[240,237,232];
+  const borderC=[221,217,210];
+
+  const sf=(c)=>doc.setFillColor(c[0],c[1],c[2]);
+  const ss=(c,w=0.3)=>{doc.setDrawColor(c[0],c[1],c[2]);doc.setLineWidth(w);};
+  const st=(c)=>doc.setTextColor(c[0],c[1],c[2]);
+  const fr=(x,ry,w,h,fill,stroke)=>{sf(fill);if(stroke)ss(stroke);doc.rect(x,ry,w,h,stroke?'FD':'F');};
+  const rr=(x,ry,w,h,r,fill,stroke)=>{sf(fill);if(stroke)ss(stroke);doc.roundedRect(x,ry,w,h,r,r,stroke?'FD':'F');};
+
+  function pageBg(){fr(0,0,PW,PH,bgC,null);}
+  pageBg();
+
+  // ── HEADER ──
+  fr(0,0,PW,26,surfC,null);
+  fr(0,26,PW,0.4,borderC,null);
+  fr(0,0,5,26,accentC,null); // left accent bar
+  doc.setFont('helvetica','bold');doc.setFontSize(16);st(ink);doc.text('WorkTrack',9,17);
+  doc.setFont('helvetica','normal');doc.setFontSize(8);st(ink3);doc.text('Daily Work Report',9,22.5);
+  // right side
+  const per=reportWeekOffset===0?'This Week':reportWeekOffset===-1?'Last Week':start.toLocaleDateString([],{month:'short',day:'numeric'})+' – '+end.toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});
+  doc.setFontSize(7.5);st(ink3);doc.text('Generated '+new Date().toLocaleString([],{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),PW-MR,10,{align:'right'});
+  doc.setFontSize(8.5);doc.setFont('helvetica','bold');st(ink2);doc.text(per,PW-MR,18,{align:'right'});
+  y=32;
+
+  // ── WEEK SUMMARY ──
+  const weekWorkMs=inRange.reduce((a,s)=>a+s.duration-calcBreakMs(s),0);
+  const weekBreakMs=inRange.reduce((a,s)=>a+calcBreakMs(s),0);
+  const weekDays=new Set(inRange.map(s=>new Date(s.start).toDateString())).size;
+  rr(ML,y,CW,20,3,surfC,borderC);
+  [{lbl:'Total Work',val:fmtDuration(weekWorkMs)||'0m 00s',col:greenC},{lbl:'Total Breaks',val:fmtDuration(weekBreakMs)||'None',col:amberC},{lbl:'Days Worked',val:weekDays+' day'+(weekDays!==1?'s':''),col:blueC}].forEach((item,i)=>{
+    const cx=ML+CW/3*i+CW/6;
+    if(i>0){ss(borderC,0.3);doc.line(ML+CW/3*i,y+3,ML+CW/3*i,y+17);}
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(item.col[0],item.col[1],item.col[2]);doc.text(item.val,cx,y+11.5,{align:'center'});
+    doc.setFont('helvetica','normal');doc.setFontSize(6);st(ink3);doc.text(item.lbl.toUpperCase(),cx,y+17,{align:'center'});
   });
-  return chips.join('');
-}
+  y+=26;
 
-function calcBreakMs(s) {
-  if (!s.events) return 0;
-  let ms = 0, lastOut = null;
-  s.events.forEach(ev => {
-    if (ev.type==='break-out'||ev.type==='geo-out') lastOut = new Date(ev.time);
-    else if ((ev.type==='break-in'||ev.type==='geo-in') && lastOut) { ms += new Date(ev.time)-lastOut; lastOut=null; }
-  });
-  return ms;
-}
+  // ── DAY GROUPS ──
+  const byDay={};inRange.forEach(s=>{const k=new Date(s.start).toDateString();if(!byDay[k])byDay[k]=[];byDay[k].push(s);});
 
-function toggleDay(card) { card.classList.toggle('open'); }
+  const evConf={'punch-in':{col:greenC,lbl:'Punch In'},'punch-out':{col:accentC,lbl:'Punch Out'},'break-out':{col:amberC,lbl:'Break Out'},'break-in':{col:blueC,lbl:'Break In'},'geo-out':{col:redC,lbl:'Left Zone (auto)'},'geo-in':{col:greenC,lbl:'Returned to Zone'}};
 
-// ─── EXPORT ──────────────────────────────────────────────────
-function exportCSV() {
-  const { start, end } = getWeekRange(reportWeekOffset);
-  const inRange = sessions.filter(s=>{const d=new Date(s.start);return d>=start&&d<=end;});
-  if (!inRange.length) { showToast('No sessions to export'); return; }
+  function checkPage(need){if(y+need>PH-14){doc.addPage();pageBg();y=16;}}
 
-  let csv = 'Date,Session,Event,Time,Duration,Note\n';
-  inRange.forEach((s,si) => {
-    const events = s.events || [{type:'punch-in',time:s.start},{type:'punch-out',time:s.end}];
-    const dateStr = new Date(s.start).toLocaleDateString([],{day:'2-digit',month:'2-digit',year:'numeric'});
-    let lastOut = null;
-    events.forEach(ev => {
-      const t = new Date(ev.time);
-      const timeStr = t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-      let dur = '';
-      if (ev.type==='break-in'||ev.type==='geo-in') {
-        if (lastOut) { dur = fmtDuration(t-lastOut); lastOut=null; }
-      }
-      if (ev.type==='break-out'||ev.type==='geo-out') lastOut = t;
-      csv += `"${dateStr}","${si+1}","${ev.type}","${timeStr}","${dur}","${ev.note||''}"\n`;
-    });
-    const breakMs = calcBreakMs(s);
-    csv += `"${dateStr}","${si+1}","session-total","","${fmtDuration(s.duration-breakMs)} work / ${fmtDuration(breakMs)} break",""\n`;
-  });
-
-  downloadFile('worktrack-report.csv', csv, 'text/csv');
-}
-
-function exportText() {
-  const { start, end } = getWeekRange(reportWeekOffset);
-  const inRange = sessions.filter(s=>{const d=new Date(s.start);return d>=start&&d<=end;});
-  if (!inRange.length) { showToast('No sessions to export'); return; }
-
-  let txt = `WORKTRACK DAILY REPORT\n`;
-  txt += `Period: ${start.toLocaleDateString()} – ${end.toLocaleDateString()}\n`;
-  txt += `Generated: ${new Date().toLocaleString()}\n`;
-  txt += '─'.repeat(50) + '\n\n';
-
-  const byDay = {};
-  inRange.forEach(s=>{const k=new Date(s.start).toDateString();if(!byDay[k])byDay[k]=[];byDay[k].push(s);});
-
-  Object.entries(byDay).forEach(([ds,daySessions])=>{
-    const dayDate=new Date(ds);
+  Object.entries(byDay).forEach(([dateStr,daySessions])=>{
+    const dayDate=new Date(dateStr);
     const dayTotalMs=daySessions.reduce((a,s)=>a+s.duration,0);
     const dayBreakMs=daySessions.reduce((a,s)=>a+calcBreakMs(s),0);
-    txt += `${dayDate.toLocaleDateString([],{weekday:'long',day:'2-digit',month:'long',year:'numeric'})}\n`;
-    txt += '─'.repeat(50) + '\n';
+    const dayWorkMs=dayTotalMs-dayBreakMs;
+
+    checkPage(36);
+    // Day header bar
+    rr(ML,y,CW,13,2,surf2C,borderC);
+    fr(ML,y,4,13,accentC,null);
+    doc.setFont('helvetica','bold');doc.setFontSize(10);st(ink);
+    doc.text(dayDate.toLocaleDateString([],{weekday:'long',day:'2-digit',month:'long',year:'numeric'}),ML+7,y+9);
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(greenC[0],greenC[1],greenC[2]);
+    doc.text(fmtDuration(dayWorkMs),PW-MR,y+9,{align:'right'});
+    y+=15;
+
     daySessions.forEach((s,si)=>{
       const events=s.events||[{type:'punch-in',time:s.start},{type:'punch-out',time:s.end}];
-      txt += `  Session ${si+1}:\n`;
-      let lastOut=null;
-      events.forEach(ev=>{
-        const t=new Date(ev.time);
-        const ts=t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-        let dur='';
-        if(ev.type==='break-in'||ev.type==='geo-in'){if(lastOut){dur=' (break: '+fmtDuration(t-lastOut)+')';lastOut=null;}}
-        if(ev.type==='break-out'||ev.type==='geo-out')lastOut=t;
-        const labels={'punch-in':'  ▶ PUNCH IN ','punch-out':'  ■ PUNCH OUT','break-out':'  ⏸ BREAK OUT','break-in':'  ▶ BREAK IN ','geo-out':'  🗺 LEFT ZONE','geo-in':'  🗺 BACK IN  '};
-        txt += `    ${labels[ev.type]||ev.type}  ${ts}${dur}${ev.note?' ['+ev.note+']':''}\n`;
+      const brkMs=calcBreakMs(s),wrkMs=s.duration-brkMs;
+
+      checkPage(14+events.length*8+12);
+
+      // Session pill
+      rr(ML+3,y,CW-6,9,2,surfC,borderC);
+      doc.setFont('helvetica','normal');doc.setFontSize(6.5);st(ink3);doc.text('SESSION '+(si+1)+(daySessions.length>1?' / '+daySessions.length:''),ML+7,y+6);
+      doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(greenC[0],greenC[1],greenC[2]);doc.text(fmtDuration(wrkMs)+' work',PW-MR-3,y+6,{align:'right'});
+      y+=11;
+
+      // Timeline
+      const dotX=ML+9,lineX=dotX,lblX=ML+15;
+      const tlTop=y;
+      let lastBrk=null;
+
+      events.forEach((ev,ei)=>{
+        const t=new Date(ev.time),ts=t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        const conf=evConf[ev.type]||{col:ink3,lbl:ev.type};
+
+        checkPage(9);
+        // dot
+        doc.setFillColor(conf.col[0],conf.col[1],conf.col[2]);doc.circle(dotX,y+2.5,1.6,'F');
+        // time
+        doc.setFont('helvetica','bold');doc.setFontSize(8);st(ink);doc.text(ts,lblX,y+4);
+        // label
+        doc.setFont('helvetica','normal');doc.setFontSize(7);st(ink2);doc.text(conf.lbl+(ev.note?' · '+ev.note:''),lblX+22,y+4);
+        // duration annotation
+        if(ev.type==='break-out'||ev.type==='geo-out'){lastBrk=t;}
+        else if((ev.type==='break-in'||ev.type==='geo-in')&&lastBrk){
+          doc.setFont('helvetica','italic');doc.setFontSize(6.5);doc.setTextColor(amberC[0],amberC[1],amberC[2]);
+          doc.text('Break: '+fmtDuration(t-lastBrk),PW-MR-3,y+4,{align:'right'});lastBrk=null;
+        }else if(ev.type==='punch-out'){
+          const pIn=findPrevIn(events,ei);
+          if(pIn){doc.setFont('helvetica','italic');doc.setFontSize(6.5);doc.setTextColor(greenC[0],greenC[1],greenC[2]);doc.text('+'+fmtDuration(t-new Date(pIn.time)),PW-MR-3,y+4,{align:'right'});}
+        }
+        y+=8;
       });
-      const bms=calcBreakMs(s);
-      txt += `    Work: ${fmtDuration(s.duration-bms)}  |  Break: ${fmtDuration(bms)||'—'}\n\n`;
+      // vertical connector
+      ss(borderC,0.25);doc.line(lineX,tlTop,lineX,y-4);
+
+      // Session totals row
+      rr(ML+3,y,CW-6,8,2,[245,241,236],borderC);
+      const cells2=[{lbl:'Work',val:fmtDuration(wrkMs),col:greenC},{lbl:'Break',val:fmtDuration(brkMs)||'—',col:amberC},{lbl:'Total',val:fmtDuration(s.duration),col:ink2}];
+      cells2.forEach((c,ci)=>{const cx2=ML+3+(CW-6)/3*ci+(CW-6)/6;doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(c.col[0],c.col[1],c.col[2]);doc.text(c.val,cx2,y+5.5,{align:'center'});});
+      y+=11;
     });
-    txt += `  Day Total: ${fmtDuration(dayTotalMs-dayBreakMs)} work  |  ${fmtDuration(dayBreakMs)||'no breaks'}\n\n`;
+
+    // Day summary footer
+    checkPage(12);
+    rr(ML,y,CW,10,2,surf2C,borderC);
+    doc.setFont('helvetica','bold');doc.setFontSize(6.5);st(ink3);doc.text('DAY TOTAL',ML+4,y+6.5);
+    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(greenC[0],greenC[1],greenC[2]);doc.text(fmtDuration(dayWorkMs)+' work',ML+28,y+6.5);
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(amberC[0],amberC[1],amberC[2]);doc.text('  ·  '+(fmtDuration(dayBreakMs)||'no breaks'),ML+65,y+6.5);
+    y+=14;
   });
 
-  downloadFile('worktrack-report.txt', txt, 'text/plain');
+  // Footer on every page
+  const np=doc.getNumberOfPages();
+  for(let p=1;p<=np;p++){
+    doc.setPage(p);
+    fr(0,PH-10,PW,10,surf2C,null);ss(borderC,0.3);doc.line(0,PH-10,PW,PH-10);
+    doc.setFont('helvetica','normal');doc.setFontSize(6.5);st(ink3);
+    doc.text('WorkTrack  ·  '+new Date().toLocaleDateString([],{year:'numeric',month:'long',day:'numeric'}),ML,PH-4);
+    doc.text('Page '+p+' of '+np,PW-MR,PH-4,{align:'right'});
+  }
+
+  const fname='worktrack-report-'+start.toISOString().slice(0,10)+'.pdf';
+  doc.save(fname);showToast('📄 PDF downloaded!');
 }
 
-function downloadFile(name, content, type) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([content],{type}));
-  a.download = name; a.click();
-  showToast('⬇ Exported ' + name);
+// ── CSV / TXT ──
+function exportCSV(){
+  const{start,end}=getWeekRange(reportWeekOffset);
+  const inRange=sessions.filter(s=>{const d=new Date(s.start);return d>=start&&d<=end;});
+  if(!inRange.length){showToast('No sessions to export');return;}
+  let csv='Date,Session,Event,Time,Duration,Note\n';
+  inRange.forEach((s,si)=>{
+    const events=s.events||[{type:'punch-in',time:s.start},{type:'punch-out',time:s.end}];
+    const dateStr=new Date(s.start).toLocaleDateString([],{day:'2-digit',month:'2-digit',year:'numeric'});
+    let lastOut=null;
+    events.forEach(ev=>{const t=new Date(ev.time),ts=t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});let dur='';if(ev.type==='break-in'||ev.type==='geo-in'){if(lastOut){dur=fmtDuration(t-lastOut);lastOut=null;}}if(ev.type==='break-out'||ev.type==='geo-out')lastOut=t;csv+=`"${dateStr}","${si+1}","${ev.type}","${ts}","${dur}","${ev.note||''}"\n`;});
+    const bms=calcBreakMs(s);csv+=`"${dateStr}","${si+1}","session-total","","${fmtDuration(s.duration-bms)} work / ${fmtDuration(bms)||'no breaks'}",""\n`;
+  });
+  downloadFile('worktrack-report.csv',csv,'text/csv');
 }
+function exportText(){
+  const{start,end}=getWeekRange(reportWeekOffset);
+  const inRange=sessions.filter(s=>{const d=new Date(s.start);return d>=start&&d<=end;});
+  if(!inRange.length){showToast('No sessions to export');return;}
+  let txt='WORKTRACK DAILY REPORT\n'+'─'.repeat(50)+'\n';
+  txt+=`Period: ${start.toLocaleDateString()} – ${end.toLocaleDateString()}\nGenerated: ${new Date().toLocaleString()}\n\n`;
+  const byDay={};inRange.forEach(s=>{const k=new Date(s.start).toDateString();if(!byDay[k])byDay[k]=[];byDay[k].push(s);});
+  Object.entries(byDay).forEach(([ds,daySessions])=>{
+    const dayDate=new Date(ds),dayTotalMs=daySessions.reduce((a,s)=>a+s.duration,0),dayBreakMs=daySessions.reduce((a,s)=>a+calcBreakMs(s),0);
+    txt+=`${dayDate.toLocaleDateString([],{weekday:'long',day:'2-digit',month:'long',year:'numeric'})}\n${'─'.repeat(50)}\n`;
+    daySessions.forEach((s,si)=>{
+      const events=s.events||[{type:'punch-in',time:s.start},{type:'punch-out',time:s.end}];txt+=`  Session ${si+1}:\n`;
+      let lastOut=null;
+      events.forEach(ev=>{const t=new Date(ev.time),ts=t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});let dur='';if(ev.type==='break-in'||ev.type==='geo-in'){if(lastOut){dur=' (break: '+fmtDuration(t-lastOut)+')';lastOut=null;}}if(ev.type==='break-out'||ev.type==='geo-out')lastOut=t;const labels={'punch-in':'▶ PUNCH IN ','punch-out':'■ PUNCH OUT','break-out':'⏸ BREAK OUT','break-in':'▶ BREAK IN ','geo-out':'↗ LEFT ZONE','geo-in':'↩ BACK IN  '};txt+=`    ${labels[ev.type]||ev.type}  ${ts}${dur}${ev.note?' ['+ev.note+']':''}\n`;});
+      const bms=calcBreakMs(s);txt+=`    Work: ${fmtDuration(s.duration-bms)}  |  Break: ${fmtDuration(bms)||'—'}\n\n`;
+    });
+    txt+=`  Day Total: ${fmtDuration(dayTotalMs-dayBreakMs)} work  |  ${fmtDuration(dayBreakMs)||'no breaks'}\n\n`;
+  });
+  downloadFile('worktrack-report.txt',txt,'text/plain');
+}
+function downloadFile(name,content,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();showToast('⬇ Exported '+name);}
 
-// ─── HELPERS ─────────────────────────────────────────────────
 function msToHMS(ms){const s=Math.floor(ms/1000);return[Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(v=>String(v).padStart(2,'0')).join(':');}
 function fmtDuration(ms){if(!ms||ms<0)return'';const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h>0?`${h}h ${String(m).padStart(2,'0')}m`:`${m}m ${String(s%60).padStart(2,'0')}s`;}
-
 let toastT;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800);}
 
-// ─── INIT ────────────────────────────────────────────────────
-updateStats();
-restoreTimerState();
-
-// Check existing permission silently
-if (navigator.permissions) {
-  navigator.permissions.query({ name:'geolocation' }).then(r=>{
-    if(r.state==='granted'){closeOverlay();if(workZone)startWatching();}
-    r.onchange=()=>{if(r.state==='granted'){closeOverlay();startWatching();}};
-  }).catch(()=>{});
-}
-
-// Restore zone display
-if (workZone) {
-  document.getElementById('zoneInfo').style.display='block';
-  document.getElementById('zoneInfo').innerHTML=`✓ <strong>${workZone.lat.toFixed(5)}, ${workZone.lng.toFixed(5)}</strong> · Radius: ${workZone.radius}m`;
-  document.getElementById('radiusInput').value=workZone.radius;
-  document.getElementById('btnSetZone').textContent='📌 Update Zone';
-}
+// ── INIT ──
+updateStats();restoreTimerState();
+if(navigator.permissions){navigator.permissions.query({name:'geolocation'}).then(r=>{if(r.state==='granted'){closeOverlay();if(workZone)startWatching();}r.onchange=()=>{if(r.state==='granted'){closeOverlay();startWatching();}};}).catch(()=>{});}
+if(workZone){document.getElementById('zoneInfo').style.display='block';document.getElementById('zoneInfo').innerHTML=`✓ <strong>${workZone.lat.toFixed(5)}, ${workZone.lng.toFixed(5)}</strong> · Radius: ${workZone.radius}m`;document.getElementById('radiusInput').value=workZone.radius;document.getElementById('btnSetZone').textContent='📌 Update Zone';}
 </script>
 </body>
 </html>
