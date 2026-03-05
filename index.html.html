@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>WorkTrack</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:#FAF8F4; --white:#FFFFFF;
+  --ink:#1A1814; --ink-light:#4A4640; --ink-muted:#9A9590;
+  --accent:#C8522A; --accent-light:#F0D5CA; --accent-hover:#A8421A;
+  --green:#2A7A4A; --green-light:#C8EAD4;
+  --amber:#C87820; --amber-light:#F5E8CC;
+  --red:#C82A2A; --red-light:#F5CACA;
+  --blue:#2A5AC8; --blue-light:#CAD5F0;
+  --border:#E8E4DE; --shadow:rgba(26,24,20,0.08); --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);min-height:100vh;min-height:100dvh;}
+
+/* PERMISSION OVERLAY */
+.perm-overlay {
+  position:fixed;inset:0;background:rgba(26,24,20,0.55);
+  z-index:500;display:flex;align-items:center;justify-content:center;
+  padding:20px;backdrop-filter:blur(4px);
+  transition:opacity 0.3s;
+}
+.perm-overlay.hidden{opacity:0;pointer-events:none;}
+.perm-card {
+  background:var(--white);border-radius:20px;
+  padding:36px 28px;max-width:360px;width:100%;
+  box-shadow:0 20px 60px rgba(26,24,20,0.2);
+  text-align:center;animation:popIn 0.3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{opacity:0;transform:scale(0.88)}to{opacity:1;transform:scale(1)}}
+.perm-icon{font-size:3rem;margin-bottom:14px;}
+.perm-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--ink);margin-bottom:8px;}
+.perm-desc{font-size:0.76rem;color:var(--ink-muted);line-height:1.7;margin-bottom:24px;}
+.perm-desc strong{color:var(--ink);}
+.perm-btn{width:100%;padding:14px;border-radius:10px;border:none;background:var(--accent);color:white;font-family:'DM Mono',monospace;font-size:0.82rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:background 0.2s,transform 0.15s;}
+.perm-btn:hover{background:var(--accent-hover);transform:translateY(-1px);}
+.perm-btn:active{transform:scale(0.97);}
+.perm-skip{display:block;margin-top:12px;font-size:0.7rem;color:var(--ink-muted);cursor:pointer;text-decoration:underline;}
+.perm-denied{background:var(--amber-light);border:1.5px solid var(--amber);border-radius:10px;padding:12px 14px;margin-top:16px;font-size:0.72rem;color:var(--amber);line-height:1.5;display:none;}
+
+/* HEADER */
+.header{background:var(--white);border-bottom:1.5px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px var(--shadow);}
+.logo{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;}
+.logo span{color:var(--accent);}
+.status-pill{display:flex;align-items:center;gap:6px;background:var(--cream);border:1.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:0.66rem;letter-spacing:0.1em;color:var(--ink-muted);text-transform:uppercase;transition:all 0.3s;}
+.status-pill.running{background:var(--green-light);border-color:var(--green);color:var(--green);}
+.status-pill.paused {background:var(--amber-light);border-color:var(--amber);color:var(--amber);}
+.status-pill.outside{background:var(--red-light);  border-color:var(--red);  color:var(--red);}
+.status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+.status-pill.running .status-dot,
+.status-pill.outside .status-dot{animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* LAYOUT */
+.container{max-width:680px;margin:0 auto;padding:24px 20px 48px;display:flex;flex-direction:column;gap:16px;}
+
+/* GEO ALERT */
+.geo-alert{background:var(--red-light);border:1.5px solid var(--red);border-radius:var(--radius);padding:14px 18px;display:none;align-items:center;gap:12px;animation:shake 0.4s ease;}
+.geo-alert.visible{display:flex;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.geo-alert-icon{font-size:1.4rem;flex-shrink:0;}
+.geo-alert-text{flex:1;font-size:0.78rem;color:var(--red);line-height:1.5;}
+.geo-alert-text strong{display:block;font-size:0.82rem;margin-bottom:2px;}
+
+/* TIMER CARD */
+.timer-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:32px 24px 28px;box-shadow:0 4px 24px var(--shadow);text-align:center;position:relative;overflow:hidden;transition:border-color 0.3s;}
+.timer-card.running{border-color:var(--accent);}
+.timer-card.outside{border-color:var(--red);}
+.timer-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--amber));transform:scaleX(0);transform-origin:left;transition:transform 0.6s ease;}
+.timer-card.running::before{transform:scaleX(1);}
+.timer-card.outside::before{background:var(--red);transform:scaleX(1);}
+.timer-label{font-size:0.65rem;letter-spacing:0.15em;color:var(--ink-muted);text-transform:uppercase;margin-bottom:10px;}
+.timer-display{font-size:4rem;font-weight:300;letter-spacing:-0.03em;line-height:1;margin-bottom:6px;transition:color 0.3s;}
+.timer-display.running{color:var(--accent);}
+.timer-display.paused {color:var(--amber);}
+.timer-display.outside{color:var(--red);}
+
+/* Date label under timer */
+.timer-date-label{font-family:'Playfair Display',serif;font-size:1rem;color:var(--ink-light);margin-bottom:4px;font-weight:600;}
+.timer-sub{font-size:0.72rem;color:var(--ink-muted);margin-bottom:6px;min-height:1.2em;}
+.geo-status-line{font-size:0.7rem;margin-bottom:24px;min-height:1.1em;display:flex;align-items:center;justify-content:center;gap:6px;}
+.geo-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.geo-dot.inside {background:var(--green);}
+.geo-dot.outside{background:var(--red);animation:blink 1s infinite;}
+.geo-dot.idle   {background:var(--ink-muted);}
+
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* BUTTONS */
+.btn{padding:13px 22px;border-radius:9px;border:none;font-family:'DM Mono',monospace;font-size:0.78rem;font-weight:500;letter-spacing:0.07em;cursor:pointer;transition:all 0.18s;text-transform:uppercase;-webkit-user-select:none;user-select:none;touch-action:manipulation;}
+.btn-primary{background:var(--accent);color:white;}
+.btn-primary:hover {background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 14px rgba(200,82,42,0.3);}
+.btn-primary:active{transform:scale(0.97);}
+.btn-secondary{background:var(--cream);color:var(--ink);border:1.5px solid var(--border);}
+.btn-secondary:hover{border-color:var(--ink-light);background:var(--border);}
+.btn-danger{background:transparent;color:var(--accent);border:1.5px solid var(--accent-light);}
+.btn-danger:hover{background:var(--accent-light);}
+.btn:disabled{opacity:0.35;cursor:not-allowed;transform:none !important;box-shadow:none !important;}
+
+/* GEOFENCE CARD */
+.geofence-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 2px 8px var(--shadow);}
+.card-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--ink);margin-bottom:4px;}
+.card-sub{font-size:0.68rem;color:var(--ink-muted);margin-bottom:16px;line-height:1.6;}
+.geofence-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;}
+.field-label{font-size:0.65rem;letter-spacing:0.1em;color:var(--ink-muted);text-transform:uppercase;margin-bottom:6px;}
+.radius-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Mono',monospace;font-size:0.85rem;color:var(--ink);background:var(--cream);outline:none;transition:border-color 0.2s;}
+.radius-input:focus{border-color:var(--accent);}
+.fence-info{margin-top:14px;background:var(--cream);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;}
+.fence-info-icon{font-size:1.1rem;}
+.fence-info-text{font-size:0.72rem;color:var(--ink-light);line-height:1.5;}
+.fence-info-text strong{color:var(--green);}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.stat-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:16px 14px;box-shadow:0 2px 8px var(--shadow);}
+.stat-label{font-size:0.6rem;letter-spacing:0.12em;color:var(--ink-muted);text-transform:uppercase;margin-bottom:6px;}
+.stat-value{font-size:1.3rem;font-weight:300;color:var(--ink);letter-spacing:-0.02em;}
+.stat-sub{font-size:0.65rem;color:var(--ink-muted);margin-top:3px;}
+
+/* SESSION LOG */
+.section-header{display:flex;align-items:center;justify-content:space-between;}
+.section-title{font-family:'Playfair Display',serif;font-size:1.05rem;}
+.section-meta{font-size:0.68rem;color:var(--ink-muted);}
+.sessions-list{display:flex;flex-direction:column;gap:10px;}
+.session-item{background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;box-shadow:0 1px 4px var(--shadow);animation:slideIn 0.25s ease;transition:box-shadow 0.2s;}
+.session-item:hover{box-shadow:0 4px 16px var(--shadow);}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.session-date-label{font-size:0.84rem;font-weight:500;color:var(--ink);margin-bottom:3px;}
+.session-timerange{font-size:0.68rem;color:var(--ink-muted);}
+.session-loc{font-size:0.64rem;color:var(--ink-muted);margin-top:2px;}
+.session-duration{font-size:1rem;font-weight:300;color:var(--accent);white-space:nowrap;text-align:right;}
+.session-delete{width:28px;height:28px;border:none;background:none;cursor:pointer;color:var(--ink-muted);font-size:0.9rem;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:background 0.2s,color 0.2s;}
+.session-delete:hover{background:var(--accent-light);color:var(--accent);}
+.empty-state{text-align:center;padding:40px 20px;color:var(--ink-muted);font-size:0.78rem;border:1.5px dashed var(--border);border-radius:var(--radius);background:var(--white);line-height:1.8;}
+.empty-icon{font-size:2rem;margin-bottom:10px;opacity:0.45;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--ink);color:white;padding:11px 22px;border-radius:8px;font-size:0.76rem;letter-spacing:0.04em;z-index:999;transition:transform 0.28s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;max-width:calc(100vw - 40px);text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── MOBILE MEDIA QUERIES ── */
+@media (max-width:360px){
+  .header{padding:12px 14px;} .logo{font-size:1.1rem;}
+  .status-pill{font-size:0.6rem;padding:4px 9px;}
+  .container{padding:12px 12px 32px;gap:12px;}
+  .timer-display{font-size:2.6rem;} .timer-card{padding:22px 14px 18px;}
+  .btn{padding:12px 14px;font-size:0.72rem;} .controls{gap:7px;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .stats-row .stat-card:last-child{grid-column:1/-1;}
+  .stat-value{font-size:1.1rem;}
+  .session-item{grid-template-columns:1fr auto;} .session-delete{display:none;}
+  .geofence-row{grid-template-columns:1fr;} .geofence-row .btn{width:100%;}
+}
+@media (max-width:480px){
+  .header{padding:13px 16px;} .logo{font-size:1.2rem;}
+  .container{padding:16px 14px 40px;gap:14px;}
+  .timer-display{font-size:3rem;} .timer-card{padding:26px 18px 22px;}
+  .controls{gap:8px;} .btn{padding:12px 18px;font-size:0.74rem;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .stats-row .stat-card:last-child{grid-column:1/-1;}
+  .session-item{grid-template-columns:1fr auto;} .session-delete{display:none;}
+}
+@media (min-width:481px) and (max-width:768px){
+  .container{padding:20px 18px 44px;}
+  .timer-display{font-size:3.8rem;}
+  .stats-row{grid-template-columns:repeat(3,1fr);}
+}
+@media (min-width:769px){
+  .timer-display{font-size:4.5rem;}
+}
+@media (max-height:500px) and (orientation:landscape){
+  .timer-card{padding:14px 20px 16px;}
+  .timer-display{font-size:2.4rem;margin-bottom:3px;}
+  .timer-sub,.geo-status-line{margin-bottom:8px;}
+  .container{gap:10px;padding:10px 16px;}
+}
+@supports (padding-bottom:env(safe-area-inset-bottom)){
+  .container{padding-bottom:calc(48px + env(safe-area-inset-bottom));}
+  .toast{bottom:calc(24px + env(safe-area-inset-bottom));}
+}
+</style>
+</head>
+<body>
+
+<!-- LOCATION PERMISSION OVERLAY -->
+<div class="perm-overlay" id="permOverlay">
+  <div class="perm-card">
+    <div class="perm-icon">📍</div>
+    <div class="perm-title">Location Access Needed</div>
+    <div class="perm-desc">
+      WorkTrack uses your GPS to set your <strong>work zone</strong> and automatically
+      pause the timer when you leave — and resume when you return.
+      <br><br>Your location is never stored on any server.
+    </div>
+    <button class="perm-btn" onclick="requestPermission()">Allow Location Access</button>
+    <span class="perm-skip" onclick="skipPermission()">Skip for now</span>
+    <div class="perm-denied" id="permDenied">
+      ⚠️ Permission was denied. Please enable Location in your browser settings, then reload the page.
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">Work<span>Track</span></div>
+  <div class="status-pill" id="statusPill">
+    <span class="status-dot"></span>
+    <span id="statusText">IDLE</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Zone-left alert -->
+  <div class="geo-alert" id="geoAlert">
+    <div class="geo-alert-icon">🚨</div>
+    <div class="geo-alert-text">
+      <strong>You left the work zone!</strong>
+      Timer auto-paused. Walk back to resume automatically.
+    </div>
+  </div>
+
+  <!-- Timer -->
+  <div class="timer-card" id="timerCard">
+    <div class="timer-label">Current Session</div>
+    <div class="timer-display" id="timerDisplay">00:00:00</div>
+    <div class="timer-date-label" id="timerDateLabel"></div>
+    <div class="timer-sub" id="timerSub">—</div>
+    <div class="geo-status-line">
+      <span class="geo-dot idle" id="geoDot"></span>
+      <span id="geoStatusText" style="color:var(--ink-muted)">Set up work zone below</span>
+    </div>
+    <div class="controls">
+      <button class="btn btn-primary"   id="btnStart" onclick="startTimer()">▶ Clock In</button>
+      <button class="btn btn-secondary" id="btnPause" onclick="manualPause()" disabled>⏸ Pause</button>
+      <button class="btn btn-danger"    id="btnStop"  onclick="stopTimer()"  disabled>■ Clock Out</button>
+    </div>
+  </div>
+
+  <!-- Geofence setup -->
+  <div class="geofence-card">
+    <div class="card-title">📍 Work Zone Setup</div>
+    <div class="card-sub">Stand at your work location and tap "Set Zone". Timer auto-pauses when you leave and resumes when you return.</div>
+    <div class="geofence-row">
+      <div>
+        <div class="field-label">Radius (meters)</div>
+        <input type="number" class="radius-input" id="radiusInput" value="100" min="20" max="5000">
+      </div>
+      <button class="btn btn-primary" onclick="setWorkZone()" id="btnSetZone" style="white-space:nowrap">📌 Set Zone</button>
+    </div>
+    <div class="fence-info" id="fenceInfo" style="display:none">
+      <div class="fence-info-icon">✅</div>
+      <div class="fence-info-text" id="fenceInfoText">Zone active.</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Today</div>
+      <div class="stat-value" id="statToday">0h 00m</div>
+      <div class="stat-sub" id="statTodaySub">0 sessions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">This Week</div>
+      <div class="stat-value" id="statWeek">0h 00m</div>
+      <div class="stat-sub">Mon–Sun</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total</div>
+      <div class="stat-value" id="statTotal">0h 00m</div>
+      <div class="stat-sub" id="statTotalSub">All time</div>
+    </div>
+  </div>
+
+  <!-- Log -->
+  <div class="section-header">
+    <div class="section-title">Session Log</div>
+    <div class="section-meta" id="sessionCount">0 entries</div>
+  </div>
+  <div class="sessions-list" id="sessionsList">
+    <div class="empty-state">
+      <div class="empty-icon">⏱</div>
+      No sessions yet.<br>Allow location, set your work zone, then clock in.
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────
+let timerInterval    = null;
+let startTimestamp   = null;
+let pausedElapsed    = 0;
+let isRunning        = false;
+let isPaused         = false;
+let autoGeopaused    = false;
+let sessionStartTime = null;
+
+let workZone        = JSON.parse(localStorage.getItem('wt_zone') || 'null');
+let locationWatchId = null;
+let insideZone      = null;
+let locationGranted = false;
+
+let sessions = JSON.parse(localStorage.getItem('wt_sessions') || '[]');
+
+// ── PERMISSION OVERLAY ─────────────────────────────
+function requestPermission() {
+  if (!navigator.geolocation) {
+    document.getElementById('permDenied').style.display = 'block';
+    document.getElementById('permDenied').textContent = '❌ Geolocation is not supported by your browser.';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      locationGranted = true;
+      closeOverlay();
+      showToast('📍 Location access granted');
+      if (workZone) startWatching();
+      else showToast('👆 Now set your work zone below');
+    },
+    err => {
+      const denied = document.getElementById('permDenied');
+      denied.style.display = 'block';
+      if (err.code === 1) {
+        denied.textContent = '⚠️ Permission denied. Enable Location in browser settings and reload.';
+      } else {
+        denied.textContent = '⚠️ Could not get location. Check GPS and try again.';
+      }
+    },
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+}
+
+function skipPermission() {
+  closeOverlay();
+  showToast('⚠️ Location skipped — geofence disabled');
+}
+
+function closeOverlay() {
+  const o = document.getElementById('permOverlay');
+  o.classList.add('hidden');
+  setTimeout(() => o.style.display = 'none', 300);
+}
+
+// ── LIVE DATE LABEL ────────────────────────────────
+function updateDateLabel() {
+  const now = new Date();
+  document.getElementById('timerDateLabel').textContent =
+    now.toLocaleDateString([], { weekday:'long', month:'long', day:'numeric' });
+}
+updateDateLabel();
+setInterval(updateDateLabel, 60000); // refresh every minute
+
+// ── TIMER ──────────────────────────────────────────
+function startTimer() {
+  if (!workZone) {
+    showToast('⚠️ Set your work zone first');
+    document.querySelector('.geofence-card').scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  if (insideZone === false) {
+    showToast('⚠️ You are outside the work zone');
+    return;
+  }
+  if (isPaused || autoGeopaused) {
+    startTimestamp = Date.now();
+    isRunning = true; isPaused = false; autoGeopaused = false;
+    timerInterval = setInterval(tick, 500);
+    setUI('running');
+    showToast('▶ Timer resumed');
+  } else {
+    startTimestamp   = Date.now();
+    pausedElapsed    = 0;
+    isRunning        = true;
+    sessionStartTime = new Date();
+    timerInterval    = setInterval(tick, 500);
+    setUI('running');
+    document.getElementById('timerSub').textContent =
+      'Started ' + sessionStartTime.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    showToast('✅ Clocked in');
+    requestWakeLock();
+  }
+}
+
+function manualPause() {
+  if (!isRunning) return;
+  doPause(false);
+  showToast('⏸ Paused manually');
+}
+
+function doPause(byGeo) {
+  clearInterval(timerInterval);
+  pausedElapsed += Date.now() - startTimestamp;
+  isRunning = false;
+  if (byGeo) { autoGeopaused = true; isPaused = false; setUI('outside'); }
+  else        { isPaused = true; autoGeopaused = false; setUI('paused'); }
+}
+
+function stopTimer() {
+  if (!isRunning && !isPaused && !autoGeopaused) return;
+  clearInterval(timerInterval);
+  const totalMs = pausedElapsed + (isRunning ? Date.now() - startTimestamp : 0);
+  const endTime = new Date();
+
+  // Record uses full date+time, no project name
+  sessions.unshift({
+    id: Date.now(),
+    start: sessionStartTime.toISOString(),
+    end:   endTime.toISOString(),
+    duration: totalMs,
+    zone: workZone ? { lat:workZone.lat, lng:workZone.lng, radius:workZone.radius } : null
+  });
+  saveSessions(); renderSessions(); updateStats();
+
+  isRunning = false; isPaused = false; autoGeopaused = false;
+  pausedElapsed = 0; startTimestamp = null; sessionStartTime = null;
+  document.getElementById('timerDisplay').textContent = '00:00:00';
+  document.getElementById('timerDisplay').className = 'timer-display';
+  document.getElementById('timerSub').textContent = '—';
+  setUI('idle');
+  showToast('✅ Clocked out — ' + formatDuration(totalMs));
+}
+
+function tick() {
+  document.getElementById('timerDisplay').textContent =
+    msToHMS(pausedElapsed + (Date.now() - startTimestamp));
+}
+
+// ── UI ─────────────────────────────────────────────
+function setUI(state) {
+  const card    = document.getElementById('timerCard');
+  const pill    = document.getElementById('statusPill');
+  const sText   = document.getElementById('statusText');
+  const display = document.getElementById('timerDisplay');
+  const btnStart= document.getElementById('btnStart');
+  const btnPause= document.getElementById('btnPause');
+  const btnStop = document.getElementById('btnStop');
+  const alert   = document.getElementById('geoAlert');
+
+  card.className = 'timer-card';
+  display.className = 'timer-display';
+  pill.className = 'status-pill';
+  alert.classList.remove('visible');
+
+  if (state === 'running') {
+    card.classList.add('running'); display.classList.add('running'); pill.classList.add('running');
+    sText.textContent = 'RUNNING';
+    btnStart.disabled = true; btnPause.disabled = false; btnStop.disabled = false;
+    btnStart.textContent = '▶ Clock In';
+  } else if (state === 'paused') {
+    pill.classList.add('paused'); display.classList.add('paused');
+    sText.textContent = 'PAUSED';
+    btnStart.disabled = false; btnPause.disabled = true; btnStop.disabled = false;
+    btnStart.textContent = '▶ Resume';
+  } else if (state === 'outside') {
+    card.classList.add('outside'); display.classList.add('outside'); pill.classList.add('outside');
+    sText.textContent = 'LEFT ZONE';
+    alert.classList.add('visible');
+    btnStart.disabled = true; btnPause.disabled = true; btnStop.disabled = false;
+    btnStart.textContent = '▶ Resume';
+  } else {
+    sText.textContent = 'IDLE';
+    btnStart.disabled = false; btnPause.disabled = true; btnStop.disabled = true;
+    btnStart.textContent = '▶ Clock In';
+  }
+}
+
+// ── GEOFENCE ───────────────────────────────────────
+function setWorkZone() {
+  if (!navigator.geolocation) { showToast('Geolocation not supported'); return; }
+  const btn = document.getElementById('btnSetZone');
+  btn.disabled = true; btn.textContent = '📡 Getting GPS...';
+
+  navigator.geolocation.getCurrentPosition(pos => {
+    const radius = Math.max(20, parseInt(document.getElementById('radiusInput').value) || 100);
+    workZone = { lat: pos.coords.latitude, lng: pos.coords.longitude, radius };
+    localStorage.setItem('wt_zone', JSON.stringify(workZone));
+    btn.disabled = false; btn.textContent = '📌 Update Zone';
+    const info = document.getElementById('fenceInfo');
+    info.style.display = 'flex';
+    document.getElementById('fenceInfoText').innerHTML =
+      `<strong>Zone locked!</strong> ${workZone.lat.toFixed(5)}, ${workZone.lng.toFixed(5)} · Radius: ${radius}m`;
+    showToast('✅ Work zone set (' + radius + 'm radius)');
+    startWatching();
+  }, err => {
+    btn.disabled = false; btn.textContent = '📌 Set Zone';
+    showToast('❌ ' + (err.code === 1 ? 'Location permission denied' : 'GPS error — try again'));
+  }, { enableHighAccuracy: true, timeout: 12000 });
+}
+
+function startWatching() {
+  if (locationWatchId !== null) navigator.geolocation.clearWatch(locationWatchId);
+  if (!navigator.geolocation) return;
+  locationWatchId = navigator.geolocation.watchPosition(pos => {
+    if (workZone) checkFence({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+  }, () => {}, { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
+}
+
+function checkFence(pos) {
+  if (!workZone) return;
+  const dist = haversine(pos.lat, pos.lng, workZone.lat, workZone.lng);
+  const nowIn = dist <= workZone.radius;
+  updateGeoLine(nowIn, dist);
+  if (nowIn === insideZone) return;
+  const prev = insideZone;
+  insideZone = nowIn;
+
+  if (!nowIn && isRunning) {
+    doPause(true);
+    showToast('🚨 Left work zone — timer paused');
+    vibrate([200, 100, 200]);
+  }
+  if (nowIn && autoGeopaused) {
+    startTimestamp = Date.now();
+    isRunning = true; autoGeopaused = false;
+    timerInterval = setInterval(tick, 500);
+    setUI('running');
+    document.getElementById('geoAlert').classList.remove('visible');
+    showToast('✅ Back in zone — timer resumed');
+    vibrate([100]);
+  }
+  if (nowIn && prev === null && !isRunning && !isPaused && !autoGeopaused) {
+    showToast('📍 Inside work zone — ready to clock in');
+  }
+}
+
+function updateGeoLine(inside, dist) {
+  const dot  = document.getElementById('geoDot');
+  const text = document.getElementById('geoStatusText');
+  const dStr = dist < 1000 ? Math.round(dist) + 'm' : (dist / 1000).toFixed(2) + 'km';
+  if (inside) {
+    dot.className = 'geo-dot inside';
+    text.style.color = 'var(--green)';
+    text.textContent = '✓ Inside work zone · ' + dStr + ' from center';
+  } else {
+    dot.className = 'geo-dot outside';
+    text.style.color = 'var(--red)';
+    text.textContent = '✗ Outside zone · ' + dStr + ' away (limit: ' + workZone.radius + 'm)';
+  }
+}
+
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371000, dL = (lat2-lat1)*Math.PI/180, dN = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dL/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dN/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+function vibrate(p) { if ('vibrate' in navigator) navigator.vibrate(p); }
+
+// ── BACKGROUND ─────────────────────────────────────
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && isRunning) tick();
+});
+let wakeLock = null;
+async function requestWakeLock() {
+  if ('wakeLock' in navigator) try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+}
+document.addEventListener('visibilitychange', async () => {
+  if (wakeLock && document.visibilityState === 'visible' && isRunning)
+    try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+});
+
+// ── SESSIONS ───────────────────────────────────────
+function sessionLabel(isoDate) {
+  const d = new Date(isoDate);
+  // e.g. "Monday, 05 Mar 2026"
+  return d.toLocaleDateString([], { weekday:'long', day:'2-digit', month:'short', year:'numeric' });
+}
+
+function renderSessions() {
+  const list = document.getElementById('sessionsList');
+  document.getElementById('sessionCount').textContent = sessions.length + ' entr' + (sessions.length === 1 ? 'y' : 'ies');
+  if (!sessions.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">⏱</div>No sessions yet.<br>Allow location, set your work zone, then clock in.</div>`;
+    return;
+  }
+  list.innerHTML = sessions.map(s => {
+    const st = new Date(s.start), en = new Date(s.end);
+    const zStr = s.zone ? `📍 ${s.zone.lat.toFixed(4)}, ${s.zone.lng.toFixed(4)} (±${s.zone.radius}m)` : '📍 No zone';
+    return `<div class="session-item">
+      <div>
+        <div class="session-date-label">${sessionLabel(s.start)}</div>
+        <div class="session-timerange">
+          ${st.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} →
+          ${en.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+        </div>
+        <div class="session-loc">${zStr}</div>
+      </div>
+      <div class="session-duration">${formatDuration(s.duration)}</div>
+      <button class="session-delete" onclick="deleteSession(${s.id})" title="Delete">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function deleteSession(id) {
+  sessions = sessions.filter(s => s.id !== id);
+  saveSessions(); renderSessions(); updateStats();
+  showToast('Session deleted');
+}
+function saveSessions() { localStorage.setItem('wt_sessions', JSON.stringify(sessions)); }
+
+function updateStats() {
+  const now = new Date(), todayStr = now.toDateString();
+  const wk = new Date(now);
+  wk.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1));
+  wk.setHours(0,0,0,0);
+  let todayMs=0, weekMs=0, totalMs=0, todayN=0;
+  sessions.forEach(s => {
+    const d = new Date(s.start); totalMs += s.duration;
+    if (d.toDateString() === todayStr) { todayMs += s.duration; todayN++; }
+    if (d >= wk) weekMs += s.duration;
+  });
+  document.getElementById('statToday').textContent  = formatDuration(todayMs);
+  document.getElementById('statTodaySub').textContent = todayN + ' session' + (todayN !== 1 ? 's' : '');
+  document.getElementById('statWeek').textContent   = formatDuration(weekMs);
+  document.getElementById('statTotal').textContent  = formatDuration(totalMs);
+  document.getElementById('statTotalSub').textContent = sessions.length + ' total';
+}
+
+// ── HELPERS ────────────────────────────────────────
+function msToHMS(ms) {
+  const s = Math.floor(ms/1000);
+  return [Math.floor(s/3600), Math.floor(s%3600/60), s%60].map(v => String(v).padStart(2,'0')).join(':');
+}
+function formatDuration(ms) {
+  const s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor(s%3600/60);
+  return h > 0 ? `${h}h ${String(m).padStart(2,'0')}m` : `${m}m ${String(s%60).padStart(2,'0')}s`;
+}
+let toastT;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── INIT ───────────────────────────────────────────
+renderSessions(); updateStats();
+
+// Check if permission already granted (Chrome Permissions API)
+if (navigator.permissions) {
+  navigator.permissions.query({ name: 'geolocation' }).then(result => {
+    if (result.state === 'granted') {
+      locationGranted = true;
+      closeOverlay();
+      if (workZone) startWatching();
+    }
+    // If 'prompt' → show overlay. If 'denied' → overlay stays, user sees skip.
+  });
+}
+
+// Restore saved zone UI
+if (workZone) {
+  document.getElementById('fenceInfo').style.display = 'flex';
+  document.getElementById('fenceInfoText').innerHTML =
+    `<strong>Zone active</strong> ${workZone.lat.toFixed(5)}, ${workZone.lng.toFixed(5)} · Radius: ${workZone.radius}m`;
+  document.getElementById('radiusInput').value = workZone.radius;
+  document.getElementById('btnSetZone').textContent = '📌 Update Zone';
+}
+</script>
+</body>
+</html>
